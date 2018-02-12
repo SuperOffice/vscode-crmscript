@@ -1,0 +1,67 @@
+{
+    "name": "crmscript",
+    "displayName": "crmscript",
+    "description": "crmscript language",
+    "version": "0.0.1",
+    "publisher": "sintef",
+    "engines": {
+        "vscode": "^1.19.0"
+    },
+    "categories": [
+        "Languages"
+    ],
+    "activationEvents": [
+        "onLanguage:crmscript",
+        "onCommand:extension.sayHello"
+    ],
+    "main": "./out/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.sayHello",
+                "title": "Hello World"
+            }
+        ],
+        "languages": [{
+            "id": "crmscript",
+            "aliases": ["crmscript", "CRMScript", "EJScript"],
+            "extensions": [".crm",".ej",".crmscript", ".ejscript"],
+            "configuration": "./language-configuration-crmscript.json"
+        }],
+        "grammars": [{
+            "language": "crmscript",
+            "scopeName": "source.crmscript",
+            "path": "./syntaxes/crmscript.tmLanguage.json"
+        }],
+        "themes": [
+            {
+                "label": "CRMScriptTheme",
+                "uiTheme": "vs-dark",
+                "path": "./themes/CRMScriptTheme-color-theme.json"
+            },
+            {
+				"label": "Sample Light",
+				"uiTheme": "vs",
+				"path": "./Sample_Light.tmTheme"
+			},
+			{
+				"label": "Sample Dark",
+				"uiTheme": "vs-dark",
+				"path": "./Sample_Dark.tmTheme"
+			}
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6",
+        "@types/node": "^7.0.43",
+        "@types/mocha": "^2.2.42"
+    }
+}

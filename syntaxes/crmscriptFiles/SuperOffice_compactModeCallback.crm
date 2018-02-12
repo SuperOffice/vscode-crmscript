@@ -1,0 +1,329 @@
+#setLanguageLevel 3;
+
+// This method will execute a SearchEngine query, by first adding the supplied fields,
+// and print it as JSON as an object with the name supplied in the key-parameter 
+
+String queryToJson(String key, SearchEngine se, String fields)
+{
+  String[] fieldsArray = fields.split(",");
+  for (Integer i = 0; i < fieldsArray.length(); i++)
+    se.addField(fieldsArray[i]);
+
+  String result = "\"" + key + "\": [";
+  for (se.execute(); !se.eof(); se.next())
+  {
+    Map tmpMap;
+    for (Integer i = 0; i < fieldsArray.length(); i++)
+    {
+      String value = se.getField(i);
+
+      if (fieldsArray[i] == "ej_message.html_body")
+        value = htmlConvToText(value);
+
+      if (fieldsArray[i] == "ej_message.type" && value == "2")
+      {
+        String bodyValue = tmpMap.get("ej_message.body");
+        tmpMap.insert("ej_message.body", htmlConvToText(bodyValue));
+      }
+
+      if (fieldsArray[i] == "ticket.owned_by.username" && value == "(System)")
+      {
+        value = getLanguageVariable("lang_global_global_notDelegated");
+      }
+
+      if (fieldsArray[i] == "ejuser.username" && value == "(System)")
+      {
+        value = getLanguageVariable("lang_global_global_notDelegated");
+      }
+
+      tmpMap.insert(fieldsArray[i], value);
+    }
+    result += tmpMap.toJson() + ",\r\n";
+  }
+  result = result.stripTrailing(",\r\n"); // Remove last comma
+  result += "]";
+  return result;
+}
+
+print("{");
+
+// This is our main router, where we choose which method to execute
+String method = getCgiVariable("method");
+if (method == "mainpage")
+{
+  // Execute a very simple query to make sure we are logged into netserver as well
+  SearchEngine ejuserQ;
+  ejuserQ.addCriteria("ejuser.id", "OperatorEquals", getVariable("activeUser"), "OperatorAnd", 0);
+  print(queryToJson("ejuser", ejuserQ, "ejuser.id,ejuser.language"));
+
+  print(", \"result\": \"ok\""); // empty json for ok login
+}
+else if (method == "listTickets")
+{
+  String filter = getCgiVariable("filter");
+  SearchEngine ticketsQ;
+
+  if (filter == "own_open")
+  {
+    ticketsQ.addCriteria("ticket.owned_by", "OperatorEquals", getVariable("activeUser"));
+    ticketsQ.addCriteria("ticket.status", "OperatorEquals", "1");
+  }
+  else if (filter == "all_open")
+  {
+    ticketsQ.addCriteria("ticket.status", "OperatorEquals", "1");
+  }
+  else if (filter.before(":") == "category")
+  {
+    ticketsQ.addCriteria("ticket.category", "OperatorEquals", filter.after(":"));
+  }
+  else if (filter.before(":") == "selection")
+  {
+    String idsString = "-1";
+    Integer[] ids = getSelectionIds(filter.after(":").toInteger());
+    for (Integer i = 0; i < ids.length() && i < 50; i++)
+      idsString += "," + ids[i].toString();
+
+    ticketsQ.addCriteria("ticket.id", "OperatorIn", idsString);
+  }
+  else if (filter == "search")
+  {
+    String ticketId = getCgiVariable("ticketId");
+    String ticketTitle = getCgiVariable("ticketTitle").urlDecode();
+    String customerName = getCgiVariable("customerName").urlDecode();
+    if (ticketId != "")
+      ticketsQ.addCriteria("ticket.id", "OperatorIn", ticketId);
+    if (ticketTitle != "")
+      ticketsQ.addCriteria("ticket.title", "OperatorContains", ticketTitle);
+    if (customerName != "")
+    {
+      ticketsQ.addCriteria("ticket.cust_id.fullName", "OperatorContains", customerName, "OperatorOr", 1);
+      ticketsQ.addCriteria("ticket.cust_id.contact_id.name", "OperatorContains", customerName, "OperatorAnd", 1);
+    }
+  }
+  else if (filter == "favourites")
+  {
+    ticketsQ.addCriteria("ticket.(Favourite->record_id).table_id", "Equals", "262");
+    ticketsQ.addCriteria("ticket.(Favourite->record_id).associate_id", "Equals", getVariable("activeAssociateId"));
+  }
+
+  ticketsQ.addCriteria("ticket.status", "lt", "4");
+
+  ticketsQ.addOrder("ticket.last_changed", false);
+  ticketsQ.setLimit(20);
+
+  print(queryToJson("tickets", ticketsQ, "ticket.id,ticket.title,ticket.category.fullname,ticket.cust_id.fullName,ticket.cust_id.contact_id.name,ticket.last_changed"));
+}
+else if (method == "listSelections")
+{
+  SearchEngine selections;
+  //selections.addCriteria("ejselection.hierarchy_id.fullname", "OperatorBeginsWith", "Mobile");
+  selections.addCriteria("ejselection.ej_table", "OperatorEquals", "ticket");
+  selections.addCriteria("ejselection.access_level", "OperatorLte", "2", "OperatorOr", 2);
+  selections.addCriteria("ejselection.creator", "OperatorEquals", getVariable("activeUser"), "OperatorAnd", 2);
+  print(queryToJson("selections", selections, "ejselection.id,ejselection.name"));
+}
+else if (method == "listCategories")
+{
+  SearchEngine categoriesQ;
+  categoriesQ.addOrder("ej_category.fullname", true);
+  print(queryToJson("categories", categoriesQ, "ej_category.id,ej_category.fullname"));
+}
+else if (method == "viewTicket")
+{
+  String ticketId = getCgiVariable("ticketId");
+  SearchEngine ticketQ;
+  ticketQ.addCriteria("ticket.id", "OperatorEquals", ticketId);
+  print(queryToJson("tickets", ticketQ, "ticket.id,ticket.title,ticket.slevel,ticket.owned_by.username,ticket.category.fullname,ticket.priority.name,ticket.ticket_status.name,ticket.cust_id.fullName,ticket.cust_id.contact_id.name,ticket.created_at,ticket.cust_id.mobile/formattedNumber,ticket.cust_id.contact_id.phone/formattedNumber"));
+
+  print(",");
+  SearchEngine messagesQ;
+  messagesQ.addCriteria("ej_message.ticket_id", "OperatorEquals", ticketId);
+  messagesQ.addOrder("ej_message.id", true);
+  print(queryToJson("messages", messagesQ, "ej_message.id,ej_message.created_at,ej_message.author,ej_message.body,ej_message.html_body,ej_message.type")); // ej_message.type must be added after ej_message.body
+}
+else if (method == "viewMessage")
+{
+  String messageId = getCgiVariable("messageId");
+  SearchEngine messageQ;
+  messageQ.addCriteria("ej_message.id", "OperatorEquals", messageId, "OperatorAnd", 0);
+  print(queryToJson("messages", messageQ, "ej_message.id,ej_message.author,ej_message.created_at,ej_message.body,ej_message.html_body,ej_message.type")); // ej_message.type must be added after ej_message.body
+  print(",");
+  SearchEngine messageHeaderQ;
+  messageHeaderQ.addCriteria("message_header.message_id", "OperatorEquals", messageId, "OperatorAnd", 0);
+  print(queryToJson("headers", messageHeaderQ, "message_header.name,message_header.value"));
+  print(",");
+  SearchEngine attachmentQ;
+  attachmentQ.addCriteria("ticket_attachment.message_id", "OperatorEquals", messageId, "OperatorAnd", 0);
+  print(queryToJson("attachments", attachmentQ, "ticket_attachment.attachment_id,ticket_attachment.attachment_id.name,ticket_attachment.attachment_id.auth_key"));
+}
+else if (method == "editTicket")
+{
+  Integer ticketId = getCgiVariable("ticketId").toInteger();
+  String replyToCustomer = getCgiVariable("replyToCustomer");
+
+  print("\"replyToCustomer\": \"" + replyToCustomer + "\",");
+
+  if (ticketId > 0)
+  {
+    SearchEngine ticketQ;
+    ticketQ.addCriteria("ticket.id", "OperatorEquals", ticketId.toString());
+    print(queryToJson("ticket", ticketQ, "ticket.id,ticket.title,ticket.owned_by,ticket.category,ticket.priority,ticket.ticket_status,ticket.activate,ticket.cust_id,ticket.cust_id.fullName,ticket.cust_id.contact_id.name"));
+    print(",");
+  }
+  else
+  {
+    print("\"ticket\": [");
+    Map defaults;
+
+    Integer defaultCategoryId = getActiveUser().getValue("defaultCategory").toInteger();
+    FHBitSet userflags;
+    userflags.set(getActiveUser().getValue("flags"));
+    if (userflags.getBitNo(2)) //Use last category checkbox set
+      defaultCategoryId = getActiveUser().getValue("lastCategory").toInteger();
+
+    defaults.insert("ticket.category", defaultCategoryId.toString());
+
+    //Status and TicketStatus
+    Integer defaultTicketStatusId = getActiveUser().getValue("defaultStatusNewTicket").toInteger();
+    defaults.insert("ticket.ticket_status", defaultTicketStatusId.toString());
+
+    //Priority
+    Integer defaultPriorityId;
+    SearchEngine sePri;
+    sePri.addField("ticket_priority.id");
+    sePri.addField("ticket_priority.flags");
+    sePri.addCriteria("ticket_priority.flags", "gt", "0");
+    for (sePri.execute(); !sePri.eof(); sePri.next())
+    {
+      FHBitSet priorityFlags;
+      priorityFlags.set(sePri.getField("ticket_priority.flags"));
+      if (priorityFlags.getBitNo(1)) //Default checkbox
+        defaultPriorityId = sePri.getField("ticket_priority.id").toInteger();
+    }
+
+    defaults.insert("ticket.priority", defaultPriorityId.toString());
+
+    print(defaults.toJson());
+    print("],");
+  }
+
+  SearchEngine usersQ;
+  usersQ.addOrder("ejuser.username", true);
+  usersQ.addCriteria("ejuser.status", "OperatorLte", "2");
+  usersQ.addCriteria("ejuser.id", "OperatorGt", "1"); // Be certain systemuser (id 1) is not included, in case status has been changed
+  print(queryToJson("users", usersQ, "ejuser.id,ejuser.username"));
+  print(",");
+  SearchEngine categoriesQ;
+  categoriesQ.addOrder("ej_category.fullname", true);
+  print(queryToJson("categories", categoriesQ, "ej_category.id,ej_category.fullname"));
+  print(",");
+  SearchEngine prioritiesQ;
+  prioritiesQ.addOrder("ticket_priority.sort_order", true);
+  print(queryToJson("priorities", prioritiesQ, "ticket_priority.id,ticket_priority.name,ticket_priority.flags"));
+  print(",");
+  SearchEngine statusQ;
+  statusQ.addCriteria("ticket_status.deleted", "notequals", "1");
+  statusQ.addCriteria("ticket_status.status", "lt", "4");
+  statusQ.addOrder("ticket_status.ts_rank", true);
+  print(queryToJson("status", statusQ, "ticket_status.id,ticket_status.name,ticket_status.status"));
+}
+else if (method == "editTicket_ok")
+{
+  Ticket theTicket;
+  Integer ticketId = getCgiVariable("ticketId").toInteger();
+  Bool replyToCustomer = (getCgiVariable("replyToCustomer") == "1");
+  theTicket.load(ticketId); // Will create new if ticketId <= 0
+
+  if (ticketId <= 0) // This is a new ticket
+  {
+    theTicket.setValue("slevel", "2");
+    theTicket.setValue("createdBy", getVariable("activeUser"));
+    theTicket.setValue("author", getVariable("activeUsername"));
+    theTicket.setValue("origin", "7");
+  }
+
+  theTicket.setValue("title", getCgiVariable("title"));
+  theTicket.setValue("ownedBy", getCgiVariable("ownedBy"));
+  theTicket.setValue("category", getCgiVariable("category"));
+  theTicket.setValue("priority", getCgiVariable("priority"));
+  theTicket.setValue("ticketStatus", getCgiVariable("status"));
+  theTicket.setValue("activate", getCgiVariable("activate"));
+  theTicket.setValue("cust_id", getCgiVariable("cust_id"));
+  ticketId = theTicket.save("Request saved by CS Compact");
+
+  Vector attachmentIds = Vector(saveAllCgiAttachments("attachment"));
+
+  if (getCgiVariable("message") != "" || attachmentIds.size() > 0) // Only save message if we have text or attachment
+  {
+    Message newMessage;
+    newMessage.setValue("ticketId", ticketId.toString());
+    if (replyToCustomer)
+      newMessage.setValue("slevel", "2");
+    else
+      newMessage.setValue("slevel", "1");
+
+    newMessage.setValue("type", "1");
+    newMessage.setValue("author", getVariable("activeUsername"));
+    newMessage.setValue("createdBy", getVariable("activeUser"));
+    newMessage.setValue("body", getCgiVariable("message"));
+    newMessage.save("Message saved by CS Compact");
+    newMessage.setAttachments(attachmentIds);
+
+    if (replyToCustomer)
+    {
+      Vector to;
+      Vector empty;
+      Customer theCustomer;
+      theCustomer.load(theTicket.getValue("custId").toInteger());
+      if (theCustomer.getValue("mainEmail") != "")
+      {
+        to.pushBack(theCustomer.getValue("mainEmail"));
+        newMessage.send(to, empty, empty);
+        newMessage.addHeader("To", theCustomer.getValue("mainEmail"));
+      }
+    }
+  }
+
+  print("\"ticketId\": " + ticketId.toString());
+}
+else if (method == "selectCustomer")
+{
+  String searchString = getCgiVariable("searchString");
+
+  SearchEngine customers;
+  customers.addCriteria("person.fullName", "OperatorBeginsWith", searchString);
+  customers.addCriteria("person.retired", "OperatorEquals", "0");
+  customers.setLimit(20);
+  print(queryToJson("customers", customers, "person.person_id,person.fullName,person.contact_id.name"));
+}
+else if (method == "viewChart")
+{
+  String chart = getCgiVariable("chart");
+  String chartType = "pie";
+  Map myMap;
+  SearchEngine ticketsQ;
+  if (chart == "openRequestsPerToplevelCategory")
+  {
+    ticketsQ.addField("ticket.category.fullname");
+    ticketsQ.addCriteria("ticket.status", "OperatorEquals", "1", "OperatorAnd", 0);
+    for (ticketsQ.execute(); !ticketsQ.eof(); ticketsQ.next())
+      myMap.increaseValueForKey(ticketsQ.getField(0).until("/"), 1);
+    chartType = "pie";
+  }
+  else if (chart == "openRequestsPerPriority")
+  {
+    ticketsQ.addField("ticket.priority.name");
+    ticketsQ.addCriteria("ticket.status", "OperatorEquals", "1", "OperatorAnd", 0);
+    for (ticketsQ.execute(); !ticketsQ.eof(); ticketsQ.next())
+      myMap.increaseValueForKey(ticketsQ.getField(0), 1);
+    chartType = "pie";
+  }
+
+  print("\"data\": " + myMap.toJson());
+  print(", \"chartType\": \"" + chartType + "\"");
+}
+else
+{
+  print("\"error\": \"Unknown method: " + method + "\"");
+}
+print("}");

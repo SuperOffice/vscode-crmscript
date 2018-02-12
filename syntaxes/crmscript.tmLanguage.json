@@ -1,0 +1,2654 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "crmscript",
+	"scopeName": "source.crmscript",
+	"fileTypes": [
+		"cgi",
+		"cr",
+		"crm",
+		"crmx",
+		"ej",
+		"crmscript",
+		"ejscript",
+		"Schemafile"
+	],
+	"firstLineMatch": "(?x)\n# Hashbang\n^\\#!.*(?:\\s|\\/)\n  (?:crmscript|maccrmscript|rake|jcrmscript|rbx|crmscript_executable_hooks)\n(?:$|\\s)\n|\n# Modeline\n(?i:\n  # Emacs\n  -\\*-(?:\\s*(?=[^:;\\s]+\\s*-\\*-)|(?:.*?[;\\s]|(?<=-\\*-))mode\\s*:\\s*)\n    crmscript\n  (?=[\\s;]|(?<![-*])-\\*-).*?-\\*-\n  |\n  # Vim\n  (?:(?:\\s|^)vi(?:m[<=>]?\\d+|m)?|\\sex)(?=:(?=\\s*set?\\s[^\\n:]+:)|:(?!\\s*set?\\s))(?:(?:\\s|\\s*:\\s*)\\w*(?:\\s*=(?:[^\\n\\\\\\s]|\\\\.)*)?)*[\\s:](?:filetype|ft|syntax)\\s*=\n    crmscript\n  (?=\\s|:|$)\n)",
+	"patterns": [
+		{
+			"captures": {
+				"1": {
+					"name": "keyword.control.class.crmscript"
+				},
+				"2": {
+					"name": "entity.name.type.class.crmscript"
+				},
+				"4": {
+					"name": "entity.other.inherited-class.crmscript"
+				},
+				"5": {
+					"name": "punctuation.separator.inheritance.crmscript"
+				},
+				"6": {
+					"name": "variable.other.object.crmscript"
+				},
+				"7": {
+					"name": "punctuation.definition.variable.crmscript"
+				}
+			},
+			"match": "(?x)\n^\\s*(class)\\s+\n(\n  (\n    [.a-zA-Z0-9_:]+\n    (\\s*(<)\\s*[.a-zA-Z0-9_:]+)?   # class A < B\n  )\n  |\n  ((<<)\\s*[.a-zA-Z0-9_:]+)         # class << C\n)",
+			"name": "meta.class.crmscript"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "keyword.control.module.crmscript"
+				},
+				"2": {
+					"name": "entity.name.type.module.crmscript"
+				},
+				"3": {
+					"name": "entity.other.inherited-class.module.first.crmscript"
+				},
+				"4": {
+					"name": "punctuation.separator.inheritance.crmscript"
+				},
+				"5": {
+					"name": "entity.other.inherited-class.module.second.crmscript"
+				},
+				"6": {
+					"name": "punctuation.separator.inheritance.crmscript"
+				},
+				"7": {
+					"name": "entity.other.inherited-class.module.third.crmscript"
+				},
+				"8": {
+					"name": "punctuation.separator.inheritance.crmscript"
+				}
+			},
+			"match": "(?x)\n^\\s*(module)\\s+\n(\n  ([A-Z]\\w*(::))?\n  ([A-Z]\\w*(::))?\n  ([A-Z]\\w*(::))*\n  [A-Z]\\w*\n)",
+			"name": "meta.module.crmscript"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "punctuation.definition.constant.hashkey.crmscript"
+				}
+			},
+			"comment": "symbols as hash key (1.9 syntax)",
+			"match": "(?>[a-zA-Z_]\\w*(?>[?!])?)(:)(?!:)",
+			"name": "constant.other.symbol.hashkey.crmscript"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "punctuation.definition.constant.crmscript"
+				}
+			},
+			"comment": "symbols as hash key (1.8 syntax)",
+			"match": "(?<!:)(:)(?>[a-zA-Z_]\\w*(?>[?!])?)(?=\\s*=>)",
+			"name": "constant.other.symbol.hashkey.crmscript"
+		},
+		{
+			"comment": "everything being a reserved word, not a value and needing a 'end' is a..",
+			"match": "(?<!\\.)\\b(class|for|else|until|if|while|struct|setLanguageLevel)\\b(?![?!])",
+			"name": "keyword.control.crmscript"
+		},
+		{
+			"comment": "contextual smart pair support for block parameters",
+			"match": "(?<!\\.)\\bdo\\b",
+			"name": "keyword.control.start-block.crmscript"
+		},
+		{
+			"comment": "contextual smart pair support",
+			"match": "(?<={)(\\s+)",
+			"name": "meta.syntax.crmscript.start-block"
+		},
+		{
+			"match": "\\bnil\\b(?![?!])",
+			"name": "constant.language.nil.crmscript"
+		},
+		{
+			"match": "\\b(true|false)\\b(?![?!])",
+			"name": "constant.language.boolean.crmscript"
+		},
+		{
+			"match": "\\b(__(FILE|LINE)__)\\b(?![?!])",
+			"name": "variable.language.crmscript"
+		},
+		{
+			"match": "\\bself\\b(?![?!])",
+			"name": "variable.language.self.crmscript"
+		},
+		{
+			"comment": " everything being a method but having a special function is a..",
+			"match": "\\b(initialize|new|loop|include|extend|prepend|raise|fail|attr_reader|attr_writer|attr_accessor|attr|catch|throw|private|private_class_method|module_function|public|public_class_method|protected|refine|using)\\b(?![?!])",
+			"name": "keyword.other.special-method.crmscript"
+		},
+		{
+			"begin": "\\b(?<!\\.|::)(require|require_relative)\\b(?![?!])",
+			"captures": {
+				"1": {
+					"name": "keyword.other.special-method.crmscript"
+				}
+			},
+			"end": "$|(?=#|})",
+			"name": "meta.require.crmscript",
+			"patterns": [
+				{
+					"include": "$self"
+				}
+			]
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "punctuation.definition.variable.crmscript"
+				}
+			},
+			"match": "(@)[a-zA-Z_]\\w*",
+			"name": "variable.other.readwrite.instance.crmscript"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "punctuation.definition.variable.crmscript"
+				}
+			},
+			"match": "(@@)[a-zA-Z_]\\w*",
+			"name": "variable.other.readwrite.class.crmscript"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "punctuation.definition.variable.crmscript"
+				}
+			},
+			"match": "(\\$)[a-zA-Z_]\\w*",
+			"name": "variable.other.readwrite.global.crmscript"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "punctuation.definition.variable.crmscript"
+				}
+			},
+			"match": "(\\$)(!|@|&|`|'|\\+|\\d+|~|=|/|\\\\|,|;|\\.|<|>|_|\\*|\\$|\\?|:|\"|-[0adFiIlpv])",
+			"name": "variable.other.readwrite.global.pre-defined.crmscript"
+		},
+		{
+			"begin": "\\b(ENV)\\[",
+			"beginCaptures": {
+				"1": {
+					"name": "variable.other.constant.crmscript"
+				}
+			},
+			"end": "]",
+			"name": "meta.environment-variable.crmscript",
+			"patterns": [
+				{
+					"include": "$self"
+				}
+			]
+		},
+		{
+			"match": "\\b[A-Z]\\w*(?=((\\.|::)[A-Za-z]|\\[))",
+			"name": "support.class.crmscript"
+		},
+		{
+			"match": "\\b[_A-Z]\\w*\\b",
+			"name": "variable.other.constant.crmscript"
+		},
+		{
+			"begin": "(?x)\n(?=def\\b)                          # optimization to help Oniguruma fail fast\n(?<=^|\\s)(def)\\s+\n(\n  (?>[a-zA-Z_]\\w*(?>\\.|::))?      # method prefix\n  (?>                               # method name\n    [a-zA-Z_]\\w*(?>[?!]|=(?!>))?\n    |\n    ===?|!=|>[>=]?|<=>|<[<=]?|[%&`/\\|]|\\*\\*?|=?~|[-+]@?|\\[]=?\n  )\n)\n\\s*(\\()",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.def.crmscript"
+				},
+				"2": {
+					"name": "entity.name.function.crmscript"
+				},
+				"3": {
+					"name": "punctuation.definition.parameters.crmscript"
+				}
+			},
+			"comment": "The method pattern comes from the symbol pattern. See there for an explanation.",
+			"end": "\\)",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.parameters.crmscript"
+				}
+			},
+			"name": "meta.function.method.with-arguments.crmscript",
+			"patterns": [
+				{
+					"begin": "(?![\\s,)])",
+					"end": "(?=,|\\)\\s*$)",
+					"patterns": [
+						{
+							"captures": {
+								"1": {
+									"name": "storage.type.variable.crmscript"
+								},
+								"2": {
+									"name": "constant.other.symbol.hashkey.parameter.function.crmscript"
+								},
+								"3": {
+									"name": "punctuation.definition.constant.hashkey.crmscript"
+								},
+								"4": {
+									"name": "variable.parameter.function.crmscript"
+								}
+							},
+							"match": "\\G([&*]?)(?:([_a-zA-Z]\\w*(:))|([_a-zA-Z]\\w*))"
+						},
+						{
+							"include": "$self"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?x)\n(?=def\\b)                          # optimization to help Oniguruma fail fast\n(?<=^|\\s)(def)\\s+\n(\n  (?>[a-zA-Z_]\\w*(?>\\.|::))?      # method prefix\n  (?>                               # method name\n    [a-zA-Z_]\\w*(?>[?!]|=(?!>))?\n    |\n    ===?|!=|>[>=]?|<=>|<[<=]?|[%&`/\\|]|\\*\\*?|=?~|[-+]@?|\\[]=?\n  )\n)\n[ \\t]\n(?=[ \\t]*[^\\s#;])                 # make sure the following is not comment",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.def.crmscript"
+				},
+				"2": {
+					"name": "entity.name.function.crmscript"
+				}
+			},
+			"comment": "same as the previous rule, but without parentheses around the arguments",
+			"end": "$",
+			"name": "meta.function.method.with-arguments.crmscript",
+			"patterns": [
+				{
+					"begin": "(?![\\s,])",
+					"end": "(?=,|$)",
+					"patterns": [
+						{
+							"captures": {
+								"1": {
+									"name": "storage.type.variable.crmscript"
+								},
+								"2": {
+									"name": "constant.other.symbol.hashkey.parameter.function.crmscript"
+								},
+								"3": {
+									"name": "punctuation.definition.constant.hashkey.crmscript"
+								},
+								"4": {
+									"name": "variable.parameter.function.crmscript"
+								}
+							},
+							"match": "\\G([&*]?)(?:([_a-zA-Z]\\w*(:))|([_a-zA-Z]\\w*))"
+						},
+						{
+							"include": "$self"
+						}
+					]
+				}
+			]
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "keyword.control.def.crmscript"
+				},
+				"3": {
+					"name": "entity.name.function.crmscript"
+				}
+			},
+			"comment": " the optional name is just to catch the def also without a method-name",
+			"match": "(?x)\n(?=def\\b)                            # optimization to help Oniguruma fail fast\n(?<=^|\\s)(def)\\b\n(\n  \\s+\n  (\n    (?>[a-zA-Z_]\\w*(?>\\.|::))?      # method prefix\n    (?>                               # method name\n      [a-zA-Z_]\\w*(?>[?!]|=(?!>))?\n      |\n      ===?|!=|>[>=]?|<=>|<[<=]?|[%&`/\\|]|\\*\\*?|=?~|[-+]@?|\\[]=?\n    )\n  )\n)?",
+			"name": "meta.function.method.without-arguments.crmscript"
+		},
+		{
+			"match": "(?x)\n\\b\n(\n  [\\d](?>_?\\d)*                             # 100_000\n  (\\.(?![^[:space:][:digit:]])(?>_?\\d)*)?   # fractional part\n  ([eE][-+]?\\d(?>_?\\d)*)?                   # 1.23e-4\n  |\n  0\n  (?:\n    [xX]\\h(?>_?\\h)*|\n    [oO]?[0-7](?>_?[0-7])*|\n    [bB][01](?>_?[01])*|\n    [dD]\\d(?>_?\\d)*\n  )                                           # A base indicator can only be used with an integer\n)\\b",
+			"name": "constant.numeric.crmscript"
+		},
+		{
+			"begin": ":'",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.symbol.begin.crmscript"
+				}
+			},
+			"comment": "symbol literal with '' delimitor",
+			"end": "'",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.symbol.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\['\\\\]",
+					"name": "constant.character.escape.crmscript"
+				}
+			]
+		},
+		{
+			"begin": ":\"",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.symbol.begin.crmscript"
+				}
+			},
+			"comment": "symbol literal with \"\" delimitor",
+			"end": "\"",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.symbol.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				}
+			]
+		},
+		{
+			"comment": "Needs higher precidence than regular expressions.",
+			"match": "(?<!\\()/=",
+			"name": "keyword.operator.assignment.augmented.crmscript"
+		},
+		{
+			"begin": "'",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"comment": "string literal with '' delimitor",
+			"end": "'",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.quoted.single.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\'|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				}
+			]
+		},
+		{
+			"begin": "\"",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"comment": "string literal with interpolation and \"\" delimitor",
+			"end": "\"",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.quoted.double.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				}
+			]
+		},
+		{
+			"begin": "`",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"comment": "execute string (allows for interpolation)",
+			"end": "`",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				}
+			]
+		},
+		{
+			"begin": "(?x)\n(?<![\\w)])((/))(?![?*+])\n(?=\n  (?:\\\\/|[^/])*+          # Do NOT change the order\n  /[eimnosux]*\\s*\n  (?:\n    [)\\]}#.,?:]|\\|\\||&&|<=>|=>|==|=~|!~|!=|;|$|\n    while|&&\n  )\n  |\n  $\n)",
+			"captures": {
+				"1": {
+					"name": "string.regexp.interpolated.crmscript"
+				},
+				"2": {
+					"name": "punctuation.section.regexp.crmscript"
+				}
+			},
+			"comment": "regular expression literal with interpolation",
+			"contentName": "string.regexp.interpolated.crmscript",
+			"end": "((/[eimnosux]*))",
+			"patterns": [
+				{
+					"include": "#regex_sub"
+				}
+			]
+		},
+		{
+			"begin": "%r{",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.regexp.begin.crmscript"
+				}
+			},
+			"end": "}[eimnosux]*",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.regexp.end.crmscript"
+				}
+			},
+			"name": "string.regexp.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#regex_sub"
+				},
+				{
+					"include": "#nest_curly_r"
+				}
+			]
+		},
+		{
+			"begin": "%r\\[",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.regexp.begin.crmscript"
+				}
+			},
+			"end": "][eimnosux]*",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.regexp.end.crmscript"
+				}
+			},
+			"name": "string.regexp.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#regex_sub"
+				},
+				{
+					"include": "#nest_brackets_r"
+				}
+			]
+		},
+		{
+			"begin": "%r\\(",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.regexp.begin.crmscript"
+				}
+			},
+			"end": "\\)[eimnosux]*",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.regexp.end.crmscript"
+				}
+			},
+			"name": "string.regexp.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#regex_sub"
+				},
+				{
+					"include": "#nest_parens_r"
+				}
+			]
+		},
+		{
+			"begin": "%r<",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.regexp.begin.crmscript"
+				}
+			},
+			"end": ">[eimnosux]*",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.regexp.end.crmscript"
+				}
+			},
+			"name": "string.regexp.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#regex_sub"
+				},
+				{
+					"include": "#nest_ltgt_r"
+				}
+			]
+		},
+		{
+			"begin": "%r([^\\w])",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.regexp.begin.crmscript"
+				}
+			},
+			"end": "\\1[eimnosux]*",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.regexp.end.crmscript"
+				}
+			},
+			"name": "string.regexp.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#regex_sub"
+				}
+			]
+		},
+		{
+			"begin": "%I\\[",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "]",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_brackets_i"
+				}
+			]
+		},
+		{
+			"begin": "%I\\(",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "\\)",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_parens_i"
+				}
+			]
+		},
+		{
+			"begin": "%I<",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": ">",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_ltgt_i"
+				}
+			]
+		},
+		{
+			"begin": "%I{",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_curly_i"
+				}
+			]
+		},
+		{
+			"begin": "%I([^\\w])",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "\\1",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				}
+			]
+		},
+		{
+			"begin": "%i\\[",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "]",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\]|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_brackets"
+				}
+			]
+		},
+		{
+			"begin": "%i\\(",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "\\)",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\\\)|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_parens"
+				}
+			]
+		},
+		{
+			"begin": "%i<",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": ">",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\>|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_ltgt"
+				}
+			]
+		},
+		{
+			"begin": "%i{",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\}|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_curly"
+				}
+			]
+		},
+		{
+			"begin": "%i([^\\w])",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "\\1",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.crmscript",
+			"patterns": [
+				{
+					"comment": "Cant be named because its not neccesarily an escape.",
+					"match": "\\\\."
+				}
+			]
+		},
+		{
+			"begin": "%W\\[",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "]",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_brackets_i"
+				}
+			]
+		},
+		{
+			"begin": "%W\\(",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "\\)",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_parens_i"
+				}
+			]
+		},
+		{
+			"begin": "%W<",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": ">",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_ltgt_i"
+				}
+			]
+		},
+		{
+			"begin": "%W{",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_curly_i"
+				}
+			]
+		},
+		{
+			"begin": "%W([^\\w])",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "\\1",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				}
+			]
+		},
+		{
+			"begin": "%w\\[",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "]",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\]|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_brackets"
+				}
+			]
+		},
+		{
+			"begin": "%w\\(",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "\\)",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\\\)|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_parens"
+				}
+			]
+		},
+		{
+			"begin": "%w<",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": ">",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\>|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_ltgt"
+				}
+			]
+		},
+		{
+			"begin": "%w{",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\}|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_curly"
+				}
+			]
+		},
+		{
+			"begin": "%w([^\\w])",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.array.begin.crmscript"
+				}
+			},
+			"end": "\\1",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.array.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.crmscript",
+			"patterns": [
+				{
+					"comment": "Cant be named because its not neccesarily an escape.",
+					"match": "\\\\."
+				}
+			]
+		},
+		{
+			"begin": "%[Qx]?\\(",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"end": "\\)",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_parens_i"
+				}
+			]
+		},
+		{
+			"begin": "%[Qx]?\\[",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"end": "]",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_brackets_i"
+				}
+			]
+		},
+		{
+			"begin": "%[Qx]?{",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"end": "}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_curly_i"
+				}
+			]
+		},
+		{
+			"begin": "%[Qx]?<",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"end": ">",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_ltgt_i"
+				}
+			]
+		},
+		{
+			"begin": "%[Qx]([^\\w])",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"end": "\\1",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				}
+			]
+		},
+		{
+			"begin": "%([^\\w\\s=])",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"end": "\\1",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.interpolated.crmscript",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				}
+			]
+		},
+		{
+			"begin": "%q\\(",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"end": "\\)",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\\\)|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_parens"
+				}
+			]
+		},
+		{
+			"begin": "%q<",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"end": ">",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\>|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_ltgt"
+				}
+			]
+		},
+		{
+			"begin": "%q\\[",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"end": "]",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\]|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_brackets"
+				}
+			]
+		},
+		{
+			"begin": "%q{",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"end": "}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\}|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_curly"
+				}
+			]
+		},
+		{
+			"begin": "%q([^\\w])",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"end": "\\1",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.quoted.other.crmscript",
+			"patterns": [
+				{
+					"comment": "Cant be named because its not neccesarily an escape.",
+					"match": "\\\\."
+				}
+			]
+		},
+		{
+			"begin": "%s\\(",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.symbol.begin.crmscript"
+				}
+			},
+			"end": "\\)",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.symbol.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\\\)|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_parens"
+				}
+			]
+		},
+		{
+			"begin": "%s<",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.symbol.begin.crmscript"
+				}
+			},
+			"end": ">",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.symbol.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\>|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_ltgt"
+				}
+			]
+		},
+		{
+			"begin": "%s\\[",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.symbol.begin.crmscript"
+				}
+			},
+			"end": "]",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.symbol.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\]|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_brackets"
+				}
+			]
+		},
+		{
+			"begin": "%s{",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.symbol.begin.crmscript"
+				}
+			},
+			"end": "}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.symbol.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.crmscript",
+			"patterns": [
+				{
+					"match": "\\\\}|\\\\\\\\",
+					"name": "constant.character.escape.crmscript"
+				},
+				{
+					"include": "#nest_curly"
+				}
+			]
+		},
+		{
+			"begin": "%s([^\\w])",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.symbol.begin.crmscript"
+				}
+			},
+			"end": "\\1",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.symbol.end.crmscript"
+				}
+			},
+			"name": "constant.other.symbol.crmscript",
+			"patterns": [
+				{
+					"comment": "Cant be named because its not neccesarily an escape.",
+					"match": "\\\\."
+				}
+			]
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "punctuation.definition.constant.crmscript"
+				}
+			},
+			"comment": "symbols",
+			"match": "(?x)\n(?<!:)(:)\n(?>\n  [$a-zA-Z_]\\w*(?>[?!]|=(?![>=]))?\n  |\n  ===?|<=>|>[>=]?|<[<=]?|[%&`/\\|]|\\*\\*?|=?~|[-+]@?|\\[]=?\n  |\n  @@?[a-zA-Z_]\\w*\n)",
+			"name": "constant.other.symbol.crmscript"
+		},
+		{
+			"begin": "^//",
+			"captures": {
+				"0": {
+					"name": "punctuation.definition.comment.crmscript"
+				}
+			},
+			"comment": "multiline comments",
+			"end": "\\n",
+			"name": "comment.block.documentation.crmscript"
+		},
+		{
+			"begin": "(^[ \\t]+)?(?=//)",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.whitespace.comment.leading.crmscript"
+				}
+			},
+			"end": "(?!\\G)",
+			"patterns": [
+				{
+					"begin": "//",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.crmscript"
+						}
+					},
+					"end": "\\n",
+					"name": "comment.line.number-sign.crmscript",
+					"patterns": [
+						{
+							"include": "#yard"
+						}
+					]
+				}
+			]
+		},
+		{
+			"comment": "\n\t\t\tmatches questionmark-letters.\n\n\t\t\texamples (1st alternation = hex):\n\t\t\t?\\x1     ?\\x61\n\n\t\t\texamples (2nd alternation = octal):\n\t\t\t?\\0      ?\\07     ?\\017\n\n\t\t\texamples (3rd alternation = escaped):\n\t\t\t?\\n      ?\\b\n\n\t\t\texamples (4th alternation = meta-ctrl):\n\t\t\t?\\C-a    ?\\M-a    ?\\C-\\M-\\C-\\M-a\n\n\t\t\texamples (4th alternation = normal):\n\t\t\t?a       ?A       ?0 \n\t\t\t?*       ?\"       ?( \n\t\t\t?.       ?#\n\t\t\t\n\t\t\t\n\t\t\tthe negative lookbehind prevents against matching\n\t\t\tp(42.tainted?)\n\t\t\t",
+			"match": "(?<!\\w)\\?(\\\\(x\\h{1,2}(?!\\h)\\b|0[0-7]{0,2}(?![0-7])\\b|[^x0MC])|(\\\\[MC]-)+\\w|[^\\s\\\\])",
+			"name": "constant.numeric.crmscript"
+		},
+		{
+			"begin": "^__END__\\n",
+			"captures": {
+				"0": {
+					"name": "string.unquoted.program-block.crmscript"
+				}
+			},
+			"comment": "__END__ marker",
+			"contentName": "text.plain",
+			"end": "(?=not)impossible",
+			"patterns": [
+				{
+					"begin": "(?=<?xml|<(?i:html\\b)|!DOCTYPE (?i:html\\b))",
+					"end": "(?=not)impossible",
+					"name": "text.html.embedded.crmscript",
+					"patterns": [
+						{
+							"include": "text.html.basic"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?=(?><<[-~](\"?)((?:[_\\w]+_|)HTML)\\b\\1))",
+			"comment": "Heredoc with embedded html",
+			"end": "(?!\\G)",
+			"name": "meta.embedded.block.html",
+			"patterns": [
+				{
+					"begin": "(?><<[-~](\"?)((?:[_\\w]+_|)HTML)\\b\\1)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.crmscript"
+						}
+					},
+					"contentName": "text.html",
+					"end": "^\\s*\\2$\\n?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.crmscript"
+						}
+					},
+					"name": "string.unquoted.heredoc.crmscript",
+					"patterns": [
+						{
+							"include": "#heredoc"
+						},
+						{
+							"include": "#interpolated_crmscript"
+						},
+						{
+							"include": "text.html.basic"
+						},
+						{
+							"include": "#escaped_char"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?=(?><<[-~](\"?)((?:[_\\w]+_|)XML)\\b\\1))",
+			"comment": "Heredoc with embedded xml",
+			"end": "(?!\\G)",
+			"name": "meta.embedded.block.xml",
+			"patterns": [
+				{
+					"begin": "(?><<[-~](\"?)((?:[_\\w]+_|)XML)\\b\\1)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.crmscript"
+						}
+					},
+					"contentName": "text.xml",
+					"end": "^\\s*\\2$\\n?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.crmscript"
+						}
+					},
+					"name": "string.unquoted.heredoc.crmscript",
+					"patterns": [
+						{
+							"include": "#heredoc"
+						},
+						{
+							"include": "#interpolated_crmscript"
+						},
+						{
+							"include": "text.xml"
+						},
+						{
+							"include": "#escaped_char"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?=(?><<[-~](\"?)((?:[_\\w]+_|)SQL)\\b\\1))",
+			"comment": "Heredoc with embedded sql",
+			"end": "(?!\\G)",
+			"name": "meta.embedded.block.sql",
+			"patterns": [
+				{
+					"begin": "(?><<[-~](\"?)((?:[_\\w]+_|)SQL)\\b\\1)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.crmscript"
+						}
+					},
+					"contentName": "source.sql",
+					"end": "^\\s*\\2$\\n?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.crmscript"
+						}
+					},
+					"name": "string.unquoted.heredoc.crmscript",
+					"patterns": [
+						{
+							"include": "#heredoc"
+						},
+						{
+							"include": "#interpolated_crmscript"
+						},
+						{
+							"include": "source.sql"
+						},
+						{
+							"include": "#escaped_char"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?=(?><<[-~](\"?)((?:[_\\w]+_|)GRAPHQL)\\b\\1))",
+			"comment": "Heredoc with embedded GraphQL",
+			"end": "(?!\\G)",
+			"name": "meta.embedded.block.graphql",
+			"patterns": [
+				{
+					"begin": "(?><<[-~](\"?)((?:[_\\w]+_|)GRAPHQL)\\b\\1)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.crmscript"
+						}
+					},
+					"contentName": "source.graphql",
+					"end": "^\\s*\\2$\\n?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.crmscript"
+						}
+					},
+					"name": "string.unquoted.heredoc.crmscript",
+					"patterns": [
+						{
+							"include": "#heredoc"
+						},
+						{
+							"include": "#interpolated_crmscript"
+						},
+						{
+							"include": "source.graphql"
+						},
+						{
+							"include": "#escaped_char"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?=(?><<[-~](\"?)((?:[_\\w]+_|)CSS)\\b\\1))",
+			"comment": "Heredoc with embedded css",
+			"end": "(?!\\G)",
+			"name": "meta.embedded.block.css",
+			"patterns": [
+				{
+					"begin": "(?><<[-~](\"?)((?:[_\\w]+_|)CSS)\\b\\1)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.crmscript"
+						}
+					},
+					"contentName": "source.css",
+					"end": "^\\s*\\2$\\n?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.crmscript"
+						}
+					},
+					"name": "string.unquoted.heredoc.crmscript",
+					"patterns": [
+						{
+							"include": "#heredoc"
+						},
+						{
+							"include": "#interpolated_crmscript"
+						},
+						{
+							"include": "source.css"
+						},
+						{
+							"include": "#escaped_char"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?=(?><<[-~](\"?)((?:[_\\w]+_|)CPP)\\b\\1))",
+			"comment": "Heredoc with embedded c++",
+			"end": "(?!\\G)",
+			"name": "meta.embedded.block.cpp",
+			"patterns": [
+				{
+					"begin": "(?><<[-~](\"?)((?:[_\\w]+_|)CPP)\\b\\1)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.crmscript"
+						}
+					},
+					"contentName": "source.cpp",
+					"end": "^\\s*\\2$\\n?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.crmscript"
+						}
+					},
+					"name": "string.unquoted.heredoc.crmscript",
+					"patterns": [
+						{
+							"include": "#heredoc"
+						},
+						{
+							"include": "#interpolated_crmscript"
+						},
+						{
+							"include": "source.cpp"
+						},
+						{
+							"include": "#escaped_char"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?=(?><<[-~](\"?)((?:[_\\w]+_|)C)\\b\\1))",
+			"comment": "Heredoc with embedded c",
+			"end": "(?!\\G)",
+			"name": "meta.embedded.block.c",
+			"patterns": [
+				{
+					"begin": "(?><<[-~](\"?)((?:[_\\w]+_|)C)\\b\\1)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.crmscript"
+						}
+					},
+					"contentName": "source.c",
+					"end": "^\\s*\\2$\\n?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.crmscript"
+						}
+					},
+					"name": "string.unquoted.heredoc.crmscript",
+					"patterns": [
+						{
+							"include": "#heredoc"
+						},
+						{
+							"include": "#interpolated_crmscript"
+						},
+						{
+							"include": "source.c"
+						},
+						{
+							"include": "#escaped_char"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?=(?><<[-~](\"?)((?:[_\\w]+_|)(?:JS|JAVASCRIPT))\\b\\1))",
+			"comment": "Heredoc with embedded javascript",
+			"end": "(?!\\G)",
+			"name": "meta.embedded.block.js",
+			"patterns": [
+				{
+					"begin": "(?><<[-~](\"?)((?:[_\\w]+_|)(?:JS|JAVASCRIPT))\\b\\1)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.crmscript"
+						}
+					},
+					"contentName": "source.js",
+					"end": "^\\s*\\2$\\n?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.crmscript"
+						}
+					},
+					"name": "string.unquoted.heredoc.crmscript",
+					"patterns": [
+						{
+							"include": "#heredoc"
+						},
+						{
+							"include": "#interpolated_crmscript"
+						},
+						{
+							"include": "source.js"
+						},
+						{
+							"include": "#escaped_char"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?=(?><<[-~](\"?)((?:[_\\w]+_|)JQUERY)\\b\\1))",
+			"comment": "Heredoc with embedded jQuery javascript",
+			"end": "(?!\\G)",
+			"name": "meta.embedded.block.js.jquery",
+			"patterns": [
+				{
+					"begin": "(?><<[-~](\"?)((?:[_\\w]+_|)JQUERY)\\b\\1)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.crmscript"
+						}
+					},
+					"contentName": "source.js.jquery",
+					"end": "^\\s*\\2$\\n?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.crmscript"
+						}
+					},
+					"name": "string.unquoted.heredoc.crmscript",
+					"patterns": [
+						{
+							"include": "#heredoc"
+						},
+						{
+							"include": "#interpolated_crmscript"
+						},
+						{
+							"include": "source.js.jquery"
+						},
+						{
+							"include": "#escaped_char"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?=(?><<[-~](\"?)((?:[_\\w]+_|)(?:SH|SHELL))\\b\\1))",
+			"comment": "Heredoc with embedded shell",
+			"end": "(?!\\G)",
+			"name": "meta.embedded.block.shell",
+			"patterns": [
+				{
+					"begin": "(?><<[-~](\"?)((?:[_\\w]+_|)(?:SH|SHELL))\\b\\1)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.crmscript"
+						}
+					},
+					"contentName": "source.shell",
+					"end": "^\\s*\\2$\\n?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.crmscript"
+						}
+					},
+					"name": "string.unquoted.heredoc.crmscript",
+					"patterns": [
+						{
+							"include": "#heredoc"
+						},
+						{
+							"include": "#interpolated_crmscript"
+						},
+						{
+							"include": "source.shell"
+						},
+						{
+							"include": "#escaped_char"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?=(?><<[-~](\"?)((?:[_\\w]+_|)LUA)\\b\\1))",
+			"comment": "Heredoc with embedded lua",
+			"end": "(?!\\G)",
+			"name": "meta.embedded.block.lua",
+			"patterns": [
+				{
+					"begin": "(?><<[-~](\"?)((?:[_\\w]+_|)LUA)\\b\\1)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.crmscript"
+						}
+					},
+					"contentName": "source.lua",
+					"end": "^\\s*\\2$\\n?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.crmscript"
+						}
+					},
+					"name": "string.unquoted.heredoc.crmscript",
+					"patterns": [
+						{
+							"include": "#heredoc"
+						},
+						{
+							"include": "#interpolated_crmscript"
+						},
+						{
+							"include": "source.lua"
+						},
+						{
+							"include": "#escaped_char"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?=(?><<[-~](\"?)((?:[_\\w]+_|)crmscript)\\b\\1))",
+			"comment": "Heredoc with embedded crmscript",
+			"end": "(?!\\G)",
+			"name": "meta.embedded.block.crmscript",
+			"patterns": [
+				{
+					"begin": "(?><<[-~](\"?)((?:[_\\w]+_|)crmscript)\\b\\1)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.crmscript"
+						}
+					},
+					"contentName": "source.crmscript",
+					"end": "^\\s*\\2$\\n?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.crmscript"
+						}
+					},
+					"name": "string.unquoted.heredoc.crmscript",
+					"patterns": [
+						{
+							"include": "#heredoc"
+						},
+						{
+							"include": "#interpolated_crmscript"
+						},
+						{
+							"include": "source.crmscript"
+						},
+						{
+							"include": "#escaped_char"
+						}
+					]
+				}
+			]
+		},
+		{
+			"begin": "(?>=\\s*<<(\\w+))",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"end": "^\\1$",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.unquoted.heredoc.crmscript",
+			"patterns": [
+				{
+					"include": "#heredoc"
+				},
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				}
+			]
+		},
+		{
+			"begin": "(?>((<<[-~](\\w+),\\s?)*<<[-~](\\w+)))",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"comment": "heredoc with multiple inputs and indented terminator",
+			"end": "^\\s*\\4$",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			},
+			"name": "string.unquoted.heredoc.crmscript",
+			"patterns": [
+				{
+					"include": "#heredoc"
+				},
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				}
+			]
+		},
+		{
+			"begin": "(?<={|{\\s|[^A-Za-z0-9_]do|^do|[^A-Za-z0-9_]do\\s|^do\\s)(\\|)",
+			"captures": {
+				"1": {
+					"name": "punctuation.separator.variable.crmscript"
+				}
+			},
+			"end": "(?<!\\|)(\\|)(?!\\|)",
+			"patterns": [
+				{
+					"include": "source.crmscript"
+				},
+				{
+					"match": "[_a-zA-Z][_a-zA-Z0-9]*",
+					"name": "variable.other.block.crmscript"
+				},
+				{
+					"match": ",",
+					"name": "punctuation.separator.variable.crmscript"
+				}
+			]
+		},
+		{
+			"match": "=>",
+			"name": "punctuation.separator.key-value"
+		},
+		{
+			"match": "->",
+			"name": "support.function.kernel.crmscript"
+		},
+		{
+			"match": "<<=|%=|&{1,2}=|\\*=|\\*\\*=|\\+=|-=|\\^=|\\|{1,2}=|<<",
+			"name": "keyword.operator.assignment.augmented.crmscript"
+		},
+		{
+			"match": "<=>|<(?!<|=)|>(?!<|=|>)|<=|>=|===|==|=~|!=|!~|(?<=[ \\t])\\?",
+			"name": "keyword.operator.comparison.crmscript"
+		},
+		{
+			"match": "(?<!\\.)\\b(and|not|or)\\b(?![?!])",
+			"name": "keyword.operator.logical.crmscript"
+		},
+		{
+			"match": "(?<=^|[ \\t])!|&&|\\|\\||\\^",
+			"name": "keyword.operator.logical.crmscript"
+		},
+		{
+			"comment": "Safe navigation operator",
+			"match": "(&\\.)\\s*(?![A-Z])",
+			"captures": {
+				"1": {
+					"name": "punctuation.separator.method.crmscript"
+				}
+			}
+		},
+		{
+			"match": "(%|&|\\*\\*|\\*|\\+|-|/)",
+			"name": "keyword.operator.arithmetic.crmscript"
+		},
+		{
+			"match": "=",
+			"name": "keyword.operator.assignment.crmscript"
+		},
+		{
+			"match": "\\||~|>>",
+			"name": "keyword.operator.other.crmscript"
+		},
+		{
+			"match": ";",
+			"name": "punctuation.separator.statement.crmscript"
+		},
+		{
+			"match": ",",
+			"name": "punctuation.separator.object.crmscript"
+		},
+		{
+			"comment": "Mark as namespace separator if double colons followed by capital letter",
+			"match": "(::)\\s*(?=[A-Z])",
+			"captures": {
+				"1": {
+					"name": "punctuation.separator.namespace.crmscript"
+				}
+			}
+		},
+		{
+			"comment": "Mark as method separator if double colons not followed by capital letter",
+			"match": "(\\.|::)\\s*(?![A-Z])",
+			"captures": {
+				"1": {
+					"name": "punctuation.separator.method.crmscript"
+				}
+			}
+		},
+		{
+			"comment": "Must come after method and constant separators to prefer double colons",
+			"match": ":",
+			"name": "punctuation.separator.other.crmscript"
+		},
+		{
+			"match": "{",
+			"name": "punctuation.section.scope.begin.crmscript"
+		},
+		{
+			"match": "}",
+			"name": "punctuation.section.scope.end.crmscript"
+		},
+		{
+			"match": "\\[",
+			"name": "punctuation.section.array.begin.crmscript"
+		},
+		{
+			"match": "]",
+			"name": "punctuation.section.array.end.crmscript"
+		},
+		{
+			"match": "\\(|\\)",
+			"name": "punctuation.section.function.crmscript"
+		}
+	],
+	"repository": {
+		"escaped_char": {
+			"match": "\\\\(?:[0-7]{1,3}|x[\\da-fA-F]{1,2}|.)",
+			"name": "constant.character.escape.crmscript"
+		},
+		"heredoc": {
+			"begin": "^<<[-~]?\\w+",
+			"end": "$",
+			"patterns": [
+				{
+					"include": "$self"
+				}
+			]
+		},
+		"interpolated_crmscript": {
+			"patterns": [
+				{
+					"begin": "#{",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.embedded.begin.crmscript"
+						}
+					},
+					"contentName": "source.crmscript",
+					"end": "}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.embedded.end.crmscript"
+						}
+					},
+					"name": "meta.embedded.line.crmscript",
+					"patterns": [
+						{
+							"include": "#nest_curly_and_self"
+						},
+						{
+							"include": "$self"
+						}
+					]
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.variable.crmscript"
+						}
+					},
+					"match": "(#@)[a-zA-Z_]\\w*",
+					"name": "variable.other.readwrite.instance.crmscript"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.variable.crmscript"
+						}
+					},
+					"match": "(#@@)[a-zA-Z_]\\w*",
+					"name": "variable.other.readwrite.class.crmscript"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.variable.crmscript"
+						}
+					},
+					"match": "(#\\$)[a-zA-Z_]\\w*",
+					"name": "variable.other.readwrite.global.crmscript"
+				}
+			]
+		},
+		"nest_brackets": {
+			"begin": "\\[",
+			"captures": {
+				"0": {
+					"name": "punctuation.section.scope.crmscript"
+				}
+			},
+			"end": "]",
+			"patterns": [
+				{
+					"include": "#nest_brackets"
+				}
+			]
+		},
+		"nest_brackets_i": {
+			"begin": "\\[",
+			"captures": {
+				"0": {
+					"name": "punctuation.section.scope.crmscript"
+				}
+			},
+			"end": "]",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_brackets_i"
+				}
+			]
+		},
+		"nest_brackets_r": {
+			"begin": "\\[",
+			"captures": {
+				"0": {
+					"name": "punctuation.section.scope.crmscript"
+				}
+			},
+			"end": "]",
+			"patterns": [
+				{
+					"include": "#regex_sub"
+				},
+				{
+					"include": "#nest_brackets_r"
+				}
+			]
+		},
+		"nest_curly": {
+			"begin": "{",
+			"captures": {
+				"0": {
+					"name": "punctuation.section.scope.crmscript"
+				}
+			},
+			"end": "}",
+			"patterns": [
+				{
+					"include": "#nest_curly"
+				}
+			]
+		},
+		"nest_curly_and_self": {
+			"patterns": [
+				{
+					"begin": "{",
+					"captures": {
+						"0": {
+							"name": "punctuation.section.scope.crmscript"
+						}
+					},
+					"end": "}",
+					"patterns": [
+						{
+							"include": "#nest_curly_and_self"
+						}
+					]
+				},
+				{
+					"include": "$self"
+				}
+			]
+		},
+		"nest_curly_i": {
+			"begin": "{",
+			"captures": {
+				"0": {
+					"name": "punctuation.section.scope.crmscript"
+				}
+			},
+			"end": "}",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_curly_i"
+				}
+			]
+		},
+		"nest_curly_r": {
+			"begin": "{",
+			"captures": {
+				"0": {
+					"name": "punctuation.section.scope.crmscript"
+				}
+			},
+			"end": "}",
+			"patterns": [
+				{
+					"include": "#regex_sub"
+				},
+				{
+					"include": "#nest_curly_r"
+				}
+			]
+		},
+		"nest_ltgt": {
+			"begin": "<",
+			"captures": {
+				"0": {
+					"name": "punctuation.section.scope.crmscript"
+				}
+			},
+			"end": ">",
+			"patterns": [
+				{
+					"include": "#nest_ltgt"
+				}
+			]
+		},
+		"nest_ltgt_i": {
+			"begin": "<",
+			"captures": {
+				"0": {
+					"name": "punctuation.section.scope.crmscript"
+				}
+			},
+			"end": ">",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_ltgt_i"
+				}
+			]
+		},
+		"nest_ltgt_r": {
+			"begin": "<",
+			"captures": {
+				"0": {
+					"name": "punctuation.section.scope.crmscript"
+				}
+			},
+			"end": ">",
+			"patterns": [
+				{
+					"include": "#regex_sub"
+				},
+				{
+					"include": "#nest_ltgt_r"
+				}
+			]
+		},
+		"nest_parens": {
+			"begin": "\\(",
+			"captures": {
+				"0": {
+					"name": "punctuation.section.scope.crmscript"
+				}
+			},
+			"end": "\\)",
+			"patterns": [
+				{
+					"include": "#nest_parens"
+				}
+			]
+		},
+		"nest_parens_i": {
+			"begin": "\\(",
+			"captures": {
+				"0": {
+					"name": "punctuation.section.scope.crmscript"
+				}
+			},
+			"end": "\\)",
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"include": "#nest_parens_i"
+				}
+			]
+		},
+		"nest_parens_r": {
+			"begin": "\\(",
+			"captures": {
+				"0": {
+					"name": "punctuation.section.scope.crmscript"
+				}
+			},
+			"end": "\\)",
+			"patterns": [
+				{
+					"include": "#regex_sub"
+				},
+				{
+					"include": "#nest_parens_r"
+				}
+			]
+		},
+		"regex_sub": {
+			"patterns": [
+				{
+					"include": "#interpolated_crmscript"
+				},
+				{
+					"include": "#escaped_char"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.arbitrary-repetition.crmscript"
+						},
+						"3": {
+							"name": "punctuation.definition.arbitrary-repetition.crmscript"
+						}
+					},
+					"match": "({)\\d+(,\\d+)?(})",
+					"name": "string.regexp.arbitrary-repetition.crmscript"
+				},
+				{
+					"begin": "\\[(?:\\^?])?",
+					"captures": {
+						"0": {
+							"name": "punctuation.definition.character-class.crmscript"
+						}
+					},
+					"end": "]",
+					"name": "string.regexp.character-class.crmscript",
+					"patterns": [
+						{
+							"include": "#escaped_char"
+						}
+					]
+				},
+				{
+					"begin": "\\(\\?#",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.begin.crmscript"
+						}
+					},
+					"end": "\\)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.end.crmscript"
+						}
+					},
+					"name": "comment.line.number-sign.crmscript",
+					"patterns": [
+						{
+							"include": "#escaped_char"
+						}
+					]
+				},
+				{
+					"begin": "\\(",
+					"captures": {
+						"0": {
+							"name": "punctuation.definition.group.crmscript"
+						}
+					},
+					"end": "\\)",
+					"name": "string.regexp.group.crmscript",
+					"patterns": [
+						{
+							"include": "#regex_sub"
+						}
+					]
+				},
+				{
+					"begin": "(?<=^|\\s)(#)\\s(?=[[a-zA-Z0-9,. \\t?!-][^\\x{00}-\\x{7F}]]*$)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.definition.comment.crmscript"
+						}
+					},
+					"comment": "We are restrictive in what we allow to go after the comment character to avoid false positives, since the availability of comments depend on regexp flags.",
+					"end": "$\\n?",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.crmscript"
+						}
+					},
+					"name": "comment.line.number-sign.crmscript"
+				}
+			]
+		},
+		"yard": {
+			"name": "comment.line.yard.crmscript",
+			"patterns": [
+				{
+					"include": "#yard_comment"
+				},
+				{
+					"include": "#yard_name_types"
+				},
+				{
+					"include": "#yard_tag"
+				},
+				{
+					"include": "#yard_types"
+				},
+				{
+					"include": "#yard_directive"
+				}
+			]
+		},
+		"yard_comment": {
+			"comment": "For YARD tags that follow the tag-comment pattern",
+			"match": "(@)(abstract|api|author|deprecated|example|note|overload|since|todo|version)(?=\\s)(.*)$",
+			"captures": {
+				"1": {
+					"name": "comment.line.keyword.punctuation.yard.crmscript"
+				},
+				"2": {
+					"name": "comment.line.keyword.yard.crmscript"
+				},
+				"3": {
+					"name": "comment.line.string.yard.crmscript"
+				}
+			}
+		},
+		"yard_name_types": {
+			"comment": "For YARD tags that follow the tag-name-types-comment pattern",
+			"match": "(@)(attr|attr_reader|attr_writer|option|param|see|yieldparam)(?=\\s)(\\s+([a-z_][a-zA-Z_]*))?(\\s+((\\[).+(])))?(.*)$",
+			"captures": {
+				"1": {
+					"name": "comment.line.keyword.punctuation.yard.crmscript"
+				},
+				"2": {
+					"name": "comment.line.keyword.yard.crmscript"
+				},
+				"3": {
+					"name": "comment.line.yard.crmscript"
+				},
+				"4": {
+					"name": "comment.line.parameter.yard.crmscript"
+				},
+				"5": {
+					"name": "comment.line.yard.crmscript"
+				},
+				"6": {
+					"name": "comment.line.type.yard.crmscript"
+				},
+				"7": {
+					"name": "comment.line.punctuation.yard.crmscript"
+				},
+				"8": {
+					"name": "comment.line.punctuation.yard.crmscript"
+				},
+				"9": {
+					"name": "comment.line.string.yard.crmscript"
+				}
+			}
+		},
+		"yard_tag": {
+			"comment": "For YARD tags that are just the tag",
+			"match": "(@)(private)$",
+			"captures": {
+				"1": {
+					"name": "comment.line.keyword.punctuation.yard.crmscript"
+				},
+				"2": {
+					"name": "comment.line.keyword.yard.crmscript"
+				}
+			}
+		},
+		"yard_types": {
+			"comment": "For YARD tags that follow the tag-types-comment pattern",
+			"match": "(@)(raise|return|yield(?:return)?)(?=\\s)(\\s+((\\[).+(])))?(.*)$",
+			"captures": {
+				"1": {
+					"name": "comment.line.keyword.punctuation.yard.crmscript"
+				},
+				"2": {
+					"name": "comment.line.keyword.yard.crmscript"
+				},
+				"3": {
+					"name": "comment.line.yard.crmscript"
+				},
+				"4": {
+					"name": "comment.line.type.yard.crmscript"
+				},
+				"5": {
+					"name": "comment.line.punctuation.yard.crmscript"
+				},
+				"6": {
+					"name": "comment.line.punctuation.yard.crmscript"
+				},
+				"7": {
+					"name": "comment.line.string.yard.crmscript"
+				}
+			}
+		},
+		"yard_directive": {
+			"comment": "For YARD directives",
+			"match": "(@!)(attribute|endgroup|group|macro|method|parse|scope|visibility)(\\s+((\\[).+(])))?(?=\\s)(.*)$",
+			"captures": {
+				"1": {
+					"name": "comment.line.keyword.punctuation.yard.crmscript"
+				},
+				"2": {
+					"name": "comment.line.keyword.yard.crmscript"
+				},
+				"3": {
+					"name": "comment.line.yard.crmscript"
+				},
+				"4": {
+					"name": "comment.line.type.yard.crmscript"
+				},
+				"5": {
+					"name": "comment.line.punctuation.yard.crmscript"
+				},
+				"6": {
+					"name": "comment.line.punctuation.yard.crmscript"
+				},
+				"7": {
+					"name": "comment.line.string.yard.crmscript"
+				}
+			}
+		}
+	}
+}
