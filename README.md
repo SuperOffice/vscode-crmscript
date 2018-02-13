@@ -1,4 +1,4 @@
-# my1stHelloWorldExtension README
+# my1stCRMScriptExtension README
 
 This is the README for your extension "vsc-crmscript". After writing up a brief description, we recommend including the following sections.
 
