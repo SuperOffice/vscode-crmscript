@@ -4,6 +4,8 @@ This is the README for your extension "vsc-crmscript". After writing up a brief 
 
 ## Features
 
+Code highlighting for CRMSCript
+
 Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
 
 For example if there is an image subfolder under your extension project workspace:

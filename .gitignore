@@ -2,3 +2,5 @@ out
 node_modules
 .vscode-test/
 .vsix
+/syntaxes/How to write a Visual Studio Code color theme from scratch.url
+/syntaxes/Togusa09-vscode-tmlanguage- Syntax highlighting for TextMate-SublimeText laguage definitions.url

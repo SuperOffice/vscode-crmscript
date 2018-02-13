@@ -26,9 +26,9 @@
 		</dict>
 		<dict>
 			<key>name</key>
-			<string>Comment</string>
+			<string>Comments</string>
 			<key>scope</key>
-			<string>comment</string>
+			<string>punctuation.definition.comment.crmscript</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
