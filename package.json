@@ -37,17 +37,17 @@
             {
                 "label": "CRMScriptTheme",
                 "uiTheme": "vs-dark",
-                "path": "./themes/CRMScriptTheme-color-theme.json"
+                "path": "./themes/CRMScriptTheme.json"
             },
             {
 				"label": "Sample Light",
 				"uiTheme": "vs",
-				"path": "./Sample_Light.tmTheme"
+				"path": "./themes/Sample_Light.tmTheme"
 			},
 			{
 				"label": "Sample Dark",
 				"uiTheme": "vs-dark",
-				"path": "./Sample_Dark.tmTheme"
+				"path": "./themes/Sample_Dark.tmTheme"
 			}
         ]
     },

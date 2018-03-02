@@ -1,0 +1,166 @@
+{   
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "CRMScript",
+    "scopeName": "source.crmscript",
+    "fileTypes": ["crmscript", "crm", "ejscript", "ej", "crmx"],
+    
+    "patterns": [
+       {
+			"begin": "\"",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.crmscript"
+				}
+			},
+			"comment": "string literal with interpolation and \"\" delimitor",
+			"end": "\"",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.crmscript"
+				}
+			}
+        },
+        
+        {
+			"comment": "everything being a reserved word, not a value and needing a 'end' is a..",
+			"match": "(?<!\\.)\\b(for|else|if|while|struct|return|setLanguageLevel)\\b(?![?!])",
+			"name": "keyword.control.crmscript"
+		},
+        
+        {
+            "begin": "\\(\\?#",
+            "beginCaptures": {
+                "0": {
+                    "name": "punctuation.definition.comment.begin.crmscript"
+                }
+            },
+            "end": "\\)",
+            "endCaptures": {
+                "0": {
+                    "name": "punctuation.definition.comment.end.crmscript"
+                }
+            }
+        },
+        {
+            "begin": "(?<=^|\\s)(#)\\s(?=[[a-zA-Z0-9,. \\t?!-][^\\x{00}-\\x{7F}]]*$)",
+            "beginCaptures": {
+                "1": {
+                    "name": "punctuation.definition.comment.crmscript"
+                }
+            },
+            "comment": "We are restrictive in what we allow to go after the comment chaøracter to avoid false positives, since the availability of comments depend on regexp flags.",
+            "end": "$\\n?",
+            "endCaptures": {
+                "0": {
+                    "name": "punctuation.definition.comment.crmscript"
+                }
+            },
+            "name": "comment.line.number-sign.crmscript"
+        },
+        {
+			"begin": "(^[ \\t]+)?(?=//)",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.whitespace.comment.leading.crmscript"
+				}
+			},
+			"end": "(?!\\G)",
+			"patterns": [
+				{
+					"begin": "//",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.crmscript"
+						}
+					},
+					"end": "\\n",
+					"name": "comment.line.number-sign.crmscript",
+					"patterns": [
+						{
+							"include": "#inline"
+						}
+					]
+				}
+			]
+		},
+		
+		{
+			"match": "(?x)\n\\b\n(\n  [\\d](?>_?\\d)* # 100_000\n  (\\.(?![^[:space:][:digit:]])(?>_?\\d)*)?   # fractional part\n  ([eE][-+]?\\d(?>_?\\d)*)?                   # 1.23e-4\n  |\n  0\n  (?:\n    [xX]\\h(?>_?\\h)*|\n    [oO]?[0-7](?>_?[0-7])*|\n    [bB][01](?>_?[01])*|\n    [dD]\\d(?>_?\\d)*\n  )                                           # A base indicator can only be used with an integer\n)\\b",
+			"name": "constant.numeric.crmscript"
+        },
+        
+		       
+		{
+			"comment": "Needs higher precidence than regular expressions.",
+			"match": "(?<!\\()/=",
+			"name": "keyword.operator.assignment.augmented.crmscript"
+		},
+		{
+			"match": "<<=|%=|&{1,2}=|\\*=|\\*\\*=|\\+=|-=|\\^=|\\|{1,2}=|<<",
+			"name": "keyword.operator.assignment.augmented.crmscript"
+		},
+		{
+			"match": "<=>|<(?!<|=)|>(?!<|=|>)|<=|>=|===|==|=~|!=|!~|(?<=[ \\t])\\?",
+			"name": "keyword.operator.comparison.crmscript"
+		},
+		{
+			"match": "(?<!\\.)\\b(and|not|or)\\b(?![?!])",
+			"name": "keyword.operator.logical.crmscript"
+		},
+		{
+			"match": "(?<=^|[ \\t])!|&&|\\|\\||\\^",
+			"name": "keyword.operator.logical.crmscript"
+		},
+		{
+			"comment": "Safe navigation operator",
+			"match": "(&\\.)\\s*(?![A-Z])",
+			"captures": {
+				"1": {
+					"name": "punctuation.separator.method.crmscript"
+				}
+			}
+		},
+		{
+			"match": "(%|&|\\*\\*|\\*|\\+|-|/)",
+			"name": "keyword.operator.arithmetic.crmscript"
+		},
+		{
+			"match": "=",
+			"name": "keyword.operator.assignment.crmscript"
+		},
+		{
+			"match": "\\||~|>>",
+			"name": "keyword.operator.other.crmscript"
+        }
+   ],
+
+   "repository": {
+		"escaped_char": {
+			"match": "\\\\(?:[0-7]{1,3}|x[\\da-fA-F]{1,2}|.)",
+			"name": "constant.character.escape.crmscript"
+		},
+		"inline": {
+			"name": "comment.line.crmscript",
+			"patterns": [
+				{
+					"include": "#inline_comment"
+				}
+			]
+		},
+		"inline_comment": {
+			"comment": "For comments that in the same line with code",
+			"match": "(?=\\s)(.*)$",
+			"captures": {
+				"1": {
+					"name": "comment.line.keyword.punctuation.crmscript"
+				},
+				"2": {
+					"name": "comment.line.keyword.crmscript"
+				},
+				"3": {
+					"name": "comment.line.string.crmscript"
+				}
+			}
+		}
+    }
+}

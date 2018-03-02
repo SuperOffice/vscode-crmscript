@@ -4,13 +4,18 @@ This is the README for your extension "vsc-crmscript". After writing up a brief 
 
 ## Features
 
-Code highlighting for CRMSCript
+Syntax Highlighting usually consists of two phases. Tokens are assigned to source code, and then they are targeted by a theme, assigned colors
+https://code.visualstudio.com/blogs/2017/02/08/syntax-highlighting-optimizations
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Code highlighting for CRMSCript. 
 
-For example if there is an image subfolder under your extension project workspace:
+The language grammars (tokens) can be defined using TextMate. 
+http://manual.macromates.com/en/language_grammars
+and/or http://docs.sublimetext.info/en/latest/extensibility/syntaxdefs.html 
+http://docs.sublimetext.info/en/latest/reference/syntaxdefs.html 
 
-\!\[feature X\]\(images/feature-x.png\)
+The language themes can be defined in  .tmTheme
+https://code.visualstudio.com/docs/extensions/themes-snippets-colorizers 
 
 > Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
@@ -19,6 +24,8 @@ For example if there is an image subfolder under your extension project workspac
 If you have any requirements or dependencies, add a section describing those and how to install and configure them.
 
 ## Extension Settings
+
+`language-configuration-crmscript.json` is to provide Smart Bracket Matching
 
 Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
 

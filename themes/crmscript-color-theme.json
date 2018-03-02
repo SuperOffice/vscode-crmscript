@@ -1,0 +1,77 @@
+{
+	"name": "CRMScriptTheme",
+	"type": "dark",
+	"colors": {
+		"list.dropBackground": "#383b3d",
+		"editor.background": "#1e1e1e",
+		"editor.foreground": "#d4d4d4",
+		"editor.inactiveSelectionBackground": "#3a3d41",
+		"editor.selectionHighlightBackground": "#add6ff26",
+		"editorIndentGuide.background": "#404040",
+		"activityBarBadge.background": "#007acc",
+		"sideBarTitle.foreground": "#bbbbbb"
+	},
+	//"tokenColors": "./crmscript.tmTheme"
+	"tokenColors": [
+		{
+			"name": "Comments",
+			"scope": [
+				"comment",
+				"punctuation.definition.comment.crmscript"
+			],
+			"settings": {
+				"foreground": "#6d6d6d",
+				"fontStyle": "italic"
+			}
+		},
+		{
+			"name": "StringBegin",
+			"scope": [
+				"string",
+				"punctuation.definition.string.begin.crmscript",
+				"punctuation.definition.string.end.crmscript"
+			],
+			"settings": {
+				"foreground": "#83df7a"
+			}
+		},
+		{
+			"name": "ConstantNumeric",
+			"scope": [
+				"constant.numeric",
+				"constant.numeric.crmscript"
+			],
+			"settings": {
+				"foreground": "#970af5"
+			}
+		},
+		{
+			"name": "OperatorAssignment",
+			"scope": [
+				"operator",
+				"keyword.operator.assignment.augmented.crmscript",
+				"keyword.operator.comparison.crmscript",
+				"keyword.operator.logical.crmscript",
+				"keyword.operator.arithmetic.crmscript",
+				"keyword.operator.assignment.crmscript",
+				"keyword.operator.other.crmscript"
+			],
+			"settings": {
+				"foreground": "#fffb00"
+			}
+		},
+		{
+			"name": "Keyword",
+			"scope": [
+				"operator",
+				"keyword.control.class.crmscript",		
+				"keyword.control.module.crmscript",	
+				"keyword.control.crmscript",	
+				"keyword.other.special-method.crmscript"		
+			],
+			"settings": {
+				"foreground": "#ff0000"
+			}
+		}
+	]
+}

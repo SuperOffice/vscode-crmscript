@@ -3,6 +3,10 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import {window, commands, Disposable, ExtensionContext, StatusBarAlignment, StatusBarItem, TextDocument} from 'vscode';
+import { ejScriptIntellisense } from './ejscriptIntellisense';
+import {getCurrentWord, createSnippetItem, getAPIinfo, getCurrentWordAtPosition} from './util';
+
+const CRMSCRIPT_MODE: vscode.DocumentFilter = { language: 'crmscript', scheme: 'file' };
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -27,7 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
         // The code you place here will be executed every time your command is executed
 
         // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World CRMScript!');
+        vscode.window.showInformationMessage('Hello World CRMScript Extension!');
 
         var editor = vscode.window.activeTextEditor;
         if (!editor) {
@@ -43,6 +47,49 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     context.subscriptions.push(disposable);
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
+            CRMSCRIPT_MODE, new CRMScriptCompletionItemProvider(), '.', '\"')
+    );
+    context.subscriptions.push(vscode.languages.registerHoverProvider(
+                    CRMSCRIPT_MODE, new CRMScriptHoverProvider())
+    );
+}
+
+class CRMScriptCompletionItemProvider implements vscode.CompletionItemProvider {
+    public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> {
+        return new Promise(
+            (resolve, reject) => {                
+                let items: vscode.CompletionItem[] = [];
+
+                let currentWord = getCurrentWord(document, position);
+                vscode.window.showInformationMessage(currentWord);
+
+                //let currentWord = getCurrentWordAtPosition(document, position);
+                //vscode.window.showInformationMessage(currentWord);
+
+                let apiItems = getAPIinfo(currentWord);
+
+                for(let item of apiItems) {
+                    items.push(createSnippetItem(item));
+                }
+                
+                resolve(items);
+            }
+        );
+    }
+}
+
+class CRMScriptHoverProvider implements vscode.HoverProvider {
+    public provideHover (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {		
+        //let currentWord = getCurrentWord(document, position);
+        //let info = getAPIinfo("String");
+        //let s = info[0].help;
+
+        let result: vscode.Hover = {
+            contents: [ejScriptIntellisense[0].help]//[s]
+        };
+        return result;
+	}
 }
 
 class WordCounter {

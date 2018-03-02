@@ -1,4 +1,33 @@
-var ejScriptIntellisense = [
+import * as vscode from 'vscode';
+
+export interface CRMScriptIntellisense {
+    text: string;
+    help: string;
+}
+
+export interface CRMScriptSuggestion {
+    class: string;
+	name: string;
+	type: string;
+}
+
+export function vscodeKindFromCRMScriptCodeClass(kind: string): vscode.CompletionItemKind {
+	switch (kind) {
+		case 'const':
+		case 'package':
+		case 'type':
+			return vscode.CompletionItemKind.Keyword;
+		case 'func':
+			return vscode.CompletionItemKind.Function;
+		case 'var':
+			return vscode.CompletionItemKind.Field;
+		case 'import':
+			return vscode.CompletionItemKind.Module;
+	}
+	return vscode.CompletionItemKind.Property; // TODO additional mappings needed?
+}
+
+export let ejScriptIntellisense : CRMScriptIntellisense[] = [
 {text: "Void.AppointmentSlicer", help: "<b>AppointmentSlicer<\/b>\n\nThis class is used to slice appointments into single entities which are within a single day. This class is essential when having calender data (with entries possibly spanning several days), which you would like to display in the calender control (which only accepts data for single days).\n\nExample code:\n\nAppointmentSlicer a;\n\na.addAppointment(1, DateTime(2017, 4, 23, 8, 0, 0), DateTime(2017, 4, 23, 10, 30, 0), \"Meeting\");\nprint(a.next().toString()); \/\/ Prints true if there is a preseding appointment the same day"},
 {text: "AppointmentSlicer.eof", help: "<b>Bool eof()<\/b>\n\nThis function will return true if the internal iterator is past the appointments for the chosen day, otherwise False."},
 {text: "AppointmentSlicer.next", help: "<b>Bool next()<\/b>\n\nThis function moves the internal iterator to next appointment in the same day.\n\nIt returns False if eof(), otherwise True."},
