@@ -22,17 +22,30 @@
                 "title": "Hello World"
             }
         ],
-        "languages": [{
-            "id": "crmscript",
-            "aliases": ["crmscript", "CRMScript", "EJScript"],
-            "extensions": [".crm",".ej",".crmscript", ".ejscript"],
-            "configuration": "./language-configuration-crmscript.json"
-        }],
-        "grammars": [{
-            "language": "crmscript",
-            "scopeName": "source.crmscript",
-            "path": "./syntaxes/crmscript.tmLanguage.json"
-        }],
+        "languages": [
+            {
+                "id": "crmscript",
+                "aliases": [
+                    "crmscript",
+                    "CRMScript",
+                    "EJScript"
+                ],
+                "extensions": [
+                    ".crm",
+                    ".ej",
+                    ".crmscript",
+                    ".ejscript"
+                ],
+                "configuration": "./language-configuration-crmscript.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "crmscript",
+                "scopeName": "source.crmscript",
+                "path": "./syntaxes/crmscript.tmLanguage.json"
+            }
+        ],
         "themes": [
             {
                 "label": "CRMScriptTheme",
@@ -40,15 +53,15 @@
                 "path": "./themes/CRMScriptTheme.json"
             },
             {
-				"label": "Sample Light",
-				"uiTheme": "vs",
-				"path": "./themes/Sample_Light.tmTheme"
-			},
-			{
-				"label": "Sample Dark",
-				"uiTheme": "vs-dark",
-				"path": "./themes/Sample_Dark.tmTheme"
-			}
+                "label": "Sample Light",
+                "uiTheme": "vs",
+                "path": "./themes/Sample_Light.tmTheme"
+            },
+            {
+                "label": "Sample Dark",
+                "uiTheme": "vs-dark",
+                "path": "./themes/Sample_Dark.tmTheme"
+            }
         ]
     },
     "scripts": {
@@ -57,6 +70,11 @@
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "dependencies": {
+        "openid-client": "^2.3.1",
+        "mac-open": "^0.1.3",
+        "open": "0.0.5"
     },
     "devDependencies": {
         "typescript": "^2.6.1",

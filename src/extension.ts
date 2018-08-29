@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 import {window, commands, Disposable, ExtensionContext, StatusBarAlignment, StatusBarItem, TextDocument} from 'vscode';
 import { ejScriptIntellisense } from './ejscriptIntellisense';
 import {getCurrentWord, createSnippetItem, getAPIinfo, getCurrentWordAtPosition} from './util';
+import {login} from './auth';
 
 const CRMSCRIPT_MODE: vscode.DocumentFilter = { language: 'crmscript', scheme: 'file' };
 
@@ -29,9 +30,9 @@ export function activate(context: vscode.ExtensionContext) {
     // The commandId parameter must match the command field in package.json
     let disposable = vscode.commands.registerCommand('extension.sayHello', () => {
         // The code you place here will be executed every time your command is executed
-
+        console.log("here")
         // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World CRMScript Extension!');
+        vscode.window.showInformationMessage(login());
 
         var editor = vscode.window.activeTextEditor;
         if (!editor) {
