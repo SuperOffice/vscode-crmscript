@@ -12,7 +12,8 @@
     ],
     "activationEvents": [
         "onLanguage:crmscript",
-        "onCommand:extension.sayHello"
+        "onCommand:extension.sayHello",
+        "onCommand:extension.createProject"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -20,6 +21,10 @@
             {
                 "command": "extension.sayHello",
                 "title": "Hello World"
+            },
+            {
+                "command": "extension.createProject",
+                "title": "Cirrus: Create Project"
             }
         ],
         "languages": [

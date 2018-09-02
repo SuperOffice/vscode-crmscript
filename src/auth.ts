@@ -26,6 +26,8 @@ export function login(){
     if(platform === 'darwin'){
         open_darwin(authurl)
     }
+    else // Now only Mac and Windowns
+        open(authurl)
     
 
     return authurl

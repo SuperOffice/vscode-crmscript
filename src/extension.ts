@@ -6,6 +6,7 @@ import {window, commands, Disposable, ExtensionContext, StatusBarAlignment, Stat
 import { ejScriptIntellisense } from './ejscriptIntellisense';
 import {getCurrentWord, createSnippetItem, getAPIinfo, getCurrentWordAtPosition} from './util';
 import {login} from './auth';
+import {createProject} from './ccproject'
 
 const CRMSCRIPT_MODE: vscode.DocumentFilter = { language: 'crmscript', scheme: 'file' };
 
@@ -48,6 +49,12 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     context.subscriptions.push(disposable);
+
+    disposable = vscode.commands.registerCommand('extension.createProject', () => {
+        createProject()
+    })
+    context.subscriptions.push(disposable);
+
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
             CRMSCRIPT_MODE, new CRMScriptCompletionItemProvider(), '.', '\"')
     );
