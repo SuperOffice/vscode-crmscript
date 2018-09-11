@@ -55,7 +55,8 @@ export function activate(context: vscode.ExtensionContext) {
     //Now starts the Cirrus commands
     let disposables = [
         vscode.commands.registerCommand('cirrus.downloadToCurrentFolder', cirrusCommands.downloadToCurrentFolder),
-        vscode.commands.registerCommand('cirrus.createProject', cirrusCommands.createProject)
+        vscode.commands.registerCommand('cirrus.createProject', cirrusCommands.createProject),
+        vscode.commands.registerCommand('cirrus.uploadAllInFolder', cirrusCommands.uploadFromCurrentFolder)
     ]
 
     disposables.forEach((d) => {

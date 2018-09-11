@@ -64,16 +64,20 @@ export class CrmScriptProject{
     }
 
     updateLocalScript(meta: ScriptMeta){
-        let scriptText = this.downloadRemoteScript(meta.uid);
+        let scriptText = api.getScriptSource(meta);
         this.writeToSource(meta.path, scriptText);
     }
 
-    /**
-     * @TODO: need the API here
-     * @param uid 
-     */
-    downloadRemoteScript(uid: string):string {
-        return `No content for ${uid}`;
+    uploadScript(meta: ScriptMeta){
+        let path = `${this.rootfolder}/${this.scriptfolder}/${meta.path}`;
+        let content = fs.readFileSync(path, 'utf-8');
+        api.uploadScriptSource(meta, content);
+    }
+
+    uploadAll(){
+        this.metas.forEach((meta)=>{
+            this.uploadScript(meta);
+        })
     }
 
     /**

@@ -14,7 +14,8 @@
         "onLanguage:crmscript",
         "onCommand:cirrus.sayHello",
         "onCommand:cirrus.createProject",
-        "onCommand:cirrus.downloadToCurrentFolder"
+        "onCommand:cirrus.downloadToCurrentFolder",
+        "onCommand:cirrus.uploadAllInFolder"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -30,6 +31,10 @@
             {
                 "command": "cirrus.downloadToCurrentFolder",
                 "title": "Cirrus: Download scripts to the current folder"
+            },
+            {
+                "command": "cirrus.uploadAllInFolder",
+                "title": "Cirrus: Upload all in the current folder"
             }
         ],
         "languages": [

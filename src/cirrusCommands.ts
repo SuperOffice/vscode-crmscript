@@ -17,6 +17,11 @@ export function downloadToCurrentFolder(){
     csProject.updateAllLocalScript();
 }
 
+export function uploadFromCurrentFolder(){
+    let csProject = getProjectForCurrentFolder();
+    csProject.uploadAll();
+}
+
 export function createProject(){
     
     let result = vscode.window.showOpenDialog({
@@ -45,7 +50,5 @@ export function onScriptFileSaved(d: vscode.TextDocument){
         return;
     }
     let ccproject = getProjectForCurrentFolder();
-    
     ccproject.timestampScript(path);
-    
 }

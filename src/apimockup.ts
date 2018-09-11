@@ -7,9 +7,8 @@ export function listAllScripts(): string{
     return '[{"uid":"cs1", "path":"account/newname.crmscript"}, {"uid":"csn", "path":"a.crmscript"}]'
 }
 
-export function getScriptSource(uid: string): string{
-    if(!token) return undefined;
-    return `Some content for ${uid}`
+export function getScriptSource(meta: ScriptMeta): string{
+    return `Some content for ${meta.uid}`
 }
 
 export function login(id:string, secret:string){
@@ -17,6 +16,6 @@ export function login(id:string, secret:string){
         token = "defined";
 }
 
-export function uploadScriptSource(meta: ScriptMeta){
-    vscode.window.showInformationMessage(`uploaded: ${meta.path} with timestamp ${meta.timestamp}`);
+export function uploadScriptSource(meta: ScriptMeta, content: string){
+    vscode.window.showInformationMessage(`uploaded: ${meta.path} with timestamp ${meta.timestamp}, and content ${content}`);
 }
