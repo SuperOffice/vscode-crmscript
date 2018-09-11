@@ -74,3 +74,13 @@ function pluck<T, K extends keyof T>(o: T, names: K[]): T[K][] {
     return names.map(n => o[n]);
 }
 */
+
+export function uri2fspath(uri: vscode.Uri){
+    if(process.platform == 'win32'){
+        return uri.path.substring(1);
+    }
+    else{
+        vscode.window.showErrorMessage("Platform not supported");
+        return uri.fsPath;
+    }
+}

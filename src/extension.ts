@@ -5,8 +5,9 @@ import * as vscode from 'vscode';
 import {window, commands, Disposable, ExtensionContext, StatusBarAlignment, StatusBarItem, TextDocument} from 'vscode';
 import { ejScriptIntellisense } from './ejscriptIntellisense';
 import {getCurrentWord, createSnippetItem, getAPIinfo, getCurrentWordAtPosition} from './util';
-import {login} from './auth';
-import {createProject} from './ccproject'
+import {login} from './api';
+
+import * as cirrusCommands from './cirrusCommands'
 
 const CRMSCRIPT_MODE: vscode.DocumentFilter = { language: 'crmscript', scheme: 'file' };
 
@@ -50,10 +51,18 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(disposable);
 
-    disposable = vscode.commands.registerCommand('extension.createProject', () => {
-        createProject()
+
+    //Now starts the Cirrus commands
+    let disposables = [
+        vscode.commands.registerCommand('cirrus.downloadToCurrentFolder', cirrusCommands.downloadToCurrentFolder),
+        vscode.commands.registerCommand('cirrus.createProject', cirrusCommands.createProject)
+    ]
+
+    disposables.forEach((d) => {
+        context.subscriptions.push(d);
     })
-    context.subscriptions.push(disposable);
+
+    vscode.workspace.onDidSaveTextDocument(cirrusCommands.onScriptFileSaved);
 
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
             CRMSCRIPT_MODE, new CRMScriptCompletionItemProvider(), '.', '\"')

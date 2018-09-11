@@ -12,8 +12,9 @@
     ],
     "activationEvents": [
         "onLanguage:crmscript",
-        "onCommand:extension.sayHello",
-        "onCommand:extension.createProject"
+        "onCommand:cirrus.sayHello",
+        "onCommand:cirrus.createProject",
+        "onCommand:cirrus.downloadToCurrentFolder"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -23,8 +24,12 @@
                 "title": "Hello World"
             },
             {
-                "command": "extension.createProject",
+                "command": "cirrus.createProject",
                 "title": "Cirrus: Create Project"
+            },
+            {
+                "command": "cirrus.downloadToCurrentFolder",
+                "title": "Cirrus: Download scripts to the current folder"
             }
         ],
         "languages": [
