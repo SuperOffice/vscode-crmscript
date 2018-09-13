@@ -1,4 +1,4 @@
-# my1stCRMScriptExtension README
+# CrmScript Editor
 
 This is the README for your extension "vsc-crmscript". After writing up a brief description, we recommend including the following sections.
 
@@ -17,11 +17,17 @@ http://docs.sublimetext.info/en/latest/reference/syntaxdefs.html
 The language themes can be defined in  .tmTheme
 https://code.visualstudio.com/docs/extensions/themes-snippets-colorizers 
 
+- Download a CrmScript project into the current opened folder: "Cirrus: Download Cirrus: Download scripts to the current folder". NB: Your changed may be overwritten. We recommend you to commit your changes before downloading.
+- Upload the current project: "Cirrus: Upload all in the current folder"
+
 > Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
-## Requirements
+## Install
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- ```git clone https://huis@bitbucket.org/cirrusproject/vscode-crmscript.git```
+- ```cd vscode-crmscript```
+- ```npm install```
+- Open VS Code from this folder (e.g., ```code .```) and debug
 
 ## Extension Settings
 

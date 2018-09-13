@@ -84,3 +84,17 @@ export function uri2fspath(uri: vscode.Uri){
         return uri.fsPath;
     }
 }
+
+export function getCurrentFsPath(){
+    let folders = vscode.workspace.workspaceFolders;
+    if(folders.length > 1){
+        vscode.window.showErrorMessage("Please keep only one folder opened");
+        return;
+    }
+    if(folders.length == 0){
+        vscode.window.showErrorMessage("No folder opened");
+        return;
+    }
+    let rootpath = uri2fspath(vscode.workspace.workspaceFolders[0].uri);
+    return rootpath
+}

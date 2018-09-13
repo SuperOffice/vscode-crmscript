@@ -1,6 +1,7 @@
 import {CrmScriptProject, getProjectForCurrentFolder} from './ccproject'
 import * as vscode from 'vscode';
 import {uri2fspath} from './util';
+import * as api from './api';
 
 var fs = require('fs')
 
@@ -51,4 +52,9 @@ export function onScriptFileSaved(d: vscode.TextDocument){
     }
     let ccproject = getProjectForCurrentFolder();
     ccproject.timestampScript(path);
+}
+
+export function login(){
+    api.openCallBackServer();
+    api.login()
 }

@@ -1,13 +1,19 @@
 import * as vscode from 'vscode';
 import * as api from './apimockup';
-import {uri2fspath} from './util'
+import {uri2fspath, getCurrentFsPath} from './util';
+var md5 = require('md5');
 var fs = require('fs')
 
 
-export interface ScriptMeta{
-    uid?: string;
-    path: string;
-    timestamp?: string;
+export interface ScriptMeta {
+    EjscriptId?: number,
+    UniqueIdentifier?: string,
+    Description: string,
+    LongDescription?: string,
+    IncludeId?: string,
+    Path: string,
+    FileName?: string,
+    BaseFileHash: string
 }
 
 export interface ClientMeta{
@@ -54,6 +60,9 @@ export class CrmScriptProject{
     updateLocalMeta(){
         let metatext = api.listAllScripts();
         this.metas = JSON.parse(metatext);
+        this.metas.forEach((meta) =>{
+            this.composeFileName(meta)
+        })
         this.saveMeta();
     }
 
@@ -65,11 +74,11 @@ export class CrmScriptProject{
 
     updateLocalScript(meta: ScriptMeta){
         let scriptText = api.getScriptSource(meta);
-        this.writeToSource(meta.path, scriptText);
+        this.writeToSource(`${meta.Path}/${meta.FileName}`, scriptText);
     }
 
     uploadScript(meta: ScriptMeta){
-        let path = `${this.rootfolder}/${this.scriptfolder}/${meta.path}`;
+        let path = `${this.rootfolder}/${this.scriptfolder}/${meta.Path}/${meta.FileName}`;
         let content = fs.readFileSync(path, 'utf-8');
         api.uploadScriptSource(meta, content);
     }
@@ -95,7 +104,9 @@ export class CrmScriptProject{
 
     getScriptMetaFromPath(path: string){
         return this.metas.find((meta) => {
-            return meta.path == path;
+            let metapathname = `${meta.Path}/${meta.FileName}`;
+            let res = (metapathname == path); 
+            return res;
         });
     }
 
@@ -105,12 +116,22 @@ export class CrmScriptProject{
         if(! meta){
             meta = this.createScriptForSource(path);
         }
-        meta.timestamp = new Date().getTime().toString();
+        let content = fs.readFileSync(absolutepath, 'utf-8')
+        meta.BaseFileHash = md5(content);
         this.saveMeta();
     }
 
     createScriptForSource(relativepath: string){
-        let newmeta:ScriptMeta = {path: relativepath, timestamp: new Date().getTime().toString()}
+        let lastslash = relativepath.lastIndexOf('/')
+        let path = relativepath.substring(0, lastslash)
+        let name = relativepath.substring(lastslash+1)
+        let newmeta:ScriptMeta = 
+        {
+            Path: relativepath, 
+            BaseFileHash: 'placeholder',
+            Description: name,
+            FileName: name
+        }
         this.metas.push(newmeta);
         this.saveMeta();
         return newmeta;
@@ -120,6 +141,9 @@ export class CrmScriptProject{
         return absolutepath.substring(this.rootfolder.length + this.scriptfolder.length + 2);
     }
 
+    /**
+     * Write meta info into disk. Recommend to invoke every time the meta is changed, so that the file on the disk is the main reference.
+     */
     saveMeta(){
         let formattedMetaText = JSON.stringify(this.metas, null, 2);
         fs.writeFileSync(`${this.rootfolder}/${this.metafile}`, formattedMetaText);
@@ -144,19 +168,29 @@ export class CrmScriptProject{
         }
         this.existingfolders.push(relativePath)    
     }
+
+    private fileNameCounts: {[id: string]: number} = {};
+    private composeFileName(meta: ScriptMeta){
+        let pathNameNoExt = `${meta.Path}/${meta.Description}`;
+        let count: number = 0;
+        let postfix = "";
+        if(this.fileNameCounts[pathNameNoExt]){
+            count = this.fileNameCounts[pathNameNoExt]
+            count = count + 1
+            postfix = ` ${count}`
+        }
+        this.fileNameCounts[pathNameNoExt] = count;
+        let pathName = `${pathNameNoExt}${postfix}.crmscript`;
+        let name = pathName.substring(pathName.lastIndexOf('/') + 1)
+        meta.FileName = name;
+        return name;
+    }
 }
 
+
+
 export function getProjectForCurrentFolder(){
-    let folders = vscode.workspace.workspaceFolders;
-    if(folders.length > 1){
-        vscode.window.showErrorMessage("Please keep only one folder opened");
-        return;
-    }
-    if(folders.length == 0){
-        vscode.window.showErrorMessage("No folder opened");
-        return;
-    }
-    let rootpath = uri2fspath(vscode.workspace.workspaceFolders[0].uri);   
+    let rootpath = getCurrentFsPath();   
     let csProject = new CrmScriptProject(rootpath);
     return csProject;
 }
