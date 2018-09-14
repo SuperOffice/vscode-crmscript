@@ -3,6 +3,7 @@ const open = require('open');
 const open_darwin = require('mac-open');
 const platform = process.platform;
 import * as vscode from 'vscode'
+import {ScriptMeta} from './ccproject'
 
 
 import { AuthorizationRequest } from "@openid/appauth/built/authorization_request";
@@ -37,6 +38,7 @@ import { StringMap } from "@openid/appauth/built/types";
 //   static ON_TOKEN_RESPONSE = "on_token_response";
 // }
 var fs = require('fs')
+var rp = require('request-promise');
 import * as express from "express";
 import { Server, Path, GET, PathParam, QueryParam } from "typescript-rest";
 import {getCurrentFsPath} from './util'
@@ -47,7 +49,8 @@ export interface ClientMeta{
 }
 
 var apiCode: string = undefined;
-var apiToken: object = undefined;
+var apiToken: TokenResponse = undefined;
+var tenant: string = undefined;
 var client: ClientMeta = undefined;
 const redirect_uri = 'http://localhost:4300/callback'
 const clientfile = 'client.json'
@@ -117,58 +120,58 @@ export function tokenRequest(){
  
 
   // use the code to make the token request.
-  request = new TokenRequest(
-    client.id, redirect_uri, GRANT_TYPE_AUTHORIZATION_CODE, apiCode, undefined,
-      {'client_secret': client.secret});
+    request = new TokenRequest(
+        client.id, redirect_uri, GRANT_TYPE_AUTHORIZATION_CODE, apiCode, undefined,
+        {'client_secret': client.secret}
+    );
 
-    
     tokenHandler.performTokenRequest(configuration, request)
     .then(response => {
         apiToken = response;
-        console.log(response);
+        let accessToken = apiToken.accessToken
+        tenant = accessToken.substring(accessToken.indexOf(':')+1, accessToken.indexOf('.'));
+        //console.log(response);
+        //console.log(tenant)
     });
 }
 
-// export function login_old() {
+export function login_old() {
 
-//     const superofficeIssuer = new Issuer({
-//         issuer: 'https://sod.superoffice.com',
-//         authorization_endpoint: 'https://sod.superoffice.com/login/common/oauth/authorize',
-//         token_endpoint: 'https://sod.superoffice.com/login/common/oauth/tokens',
-//         userinfo_endpoint: 'https://sod.superoffice.com/login/common/oauth/userinfo',
-//         jwks_uri: 'https://sod.superoffice.com/login/.well-known/jwks',
-//     }); // => Issuer
-//     console.log('Set up issuer %s %O', superofficeIssuer.issuer, superofficeIssuer.metadata);
+    const superofficeIssuer = new Issuer({
+        issuer: 'https://sod.superoffice.com',
+        authorization_endpoint: 'https://sod.superoffice.com/login/common/oauth/authorize',
+        token_endpoint: 'https://sod.superoffice.com/login/common/oauth/tokens',
+        userinfo_endpoint: 'https://sod.superoffice.com/login/common/oauth/userinfo',
+        jwks_uri: 'https://sod.superoffice.com/login/.well-known/jwks',
+    }); // => Issuer
+    console.log('Set up issuer %s %O', superofficeIssuer.issuer, superofficeIssuer.metadata);
 
-//     const client = new superofficeIssuer.Client({
-//         client_id: 'b703dda25fc5bf46c78575ca2f241d87',
-//         client_secret: '24767c27ed056d6ca4908bc7ce2dc4d5'
-//     });
+    const client = new superofficeIssuer.Client({
+        client_id: 'b703dda25fc5bf46c78575ca2f241d87',
+        client_secret: '24767c27ed056d6ca4908bc7ce2dc4d5'
+    });
 
-//     var authurl = client.authorizationUrl({
-//         redirect_uri: 'http://localhost:4300/callback',
-//         scope: 'openid email',
-//     });
-//     if (platform === 'darwin') {
-//         open_darwin(authurl)
-//     }
-//     else // Now only Mac and Windowns
-//         open(authurl) 
-//         //vscode.commands.executeCommand('vscode.open', authurl)
-
-
-//     return authurl
-// }
+    var authurl = client.authorizationUrl({
+        redirect_uri: 'http://localhost:4300/callback',
+        scope: 'openid email',
+    });
+    if (platform === 'darwin') {
+        open_darwin(authurl)
+    }
+    else // Now only Mac and Windowns
+        open(authurl) 
+        //vscode.commands.executeCommand('vscode.open', authurl)
+    return authurl
+}
 
 @Path("/callback")
-class HelloService {
-    
+class HelloService {    
     @GET
     sayHello(@QueryParam('state') state: string, @QueryParam('code') code: string): string {
         apiCode = code;
-        console.log(code);
+        //console.log(code);
         tokenRequest();
-        return `Login successful, with code: ${code}`;
+        return `Login successfully. Happy Scripting!`;
     }
 }
 export function openCallBackServer() {
@@ -180,4 +183,19 @@ export function openCallBackServer() {
         console.log('Callback Server listening on localhost:4300!');
     });
 
+}
+
+
+export function getScriptSource(meta: ScriptMeta, callback: (string)=>void): string{
+    if(!meta.UniqueIdentifier)
+        return undefined;
+    let options = {
+        uri: `https://sod.superoffice.com/${tenant}/api/v1/CRMScript/${meta.UniqueIdentifier}/Source`,
+        headers: {
+            'Authorization': `Bearer ${apiToken.accessToken}`
+        }
+    };
+    rp(options).then((res)=>{
+        callback(res)
+    })
 }

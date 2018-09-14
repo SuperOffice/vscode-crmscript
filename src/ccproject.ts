@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as api from './apimockup';
+import {getScriptSource} from './api';
 import {uri2fspath, getCurrentFsPath} from './util';
 var md5 = require('md5');
 var fs = require('fs')
@@ -73,8 +74,10 @@ export class CrmScriptProject{
     }
 
     updateLocalScript(meta: ScriptMeta){
-        let scriptText = api.getScriptSource(meta);
-        this.writeToSource(`${meta.Path}/${meta.FileName}`, scriptText);
+        getScriptSource(meta, (res) =>{
+            let puretext = this.fromRemoteText(res);          
+            this.writeToSource(`${meta.Path}/${meta.FileName}`, puretext);
+        });
     }
 
     uploadScript(meta: ScriptMeta){
@@ -116,7 +119,7 @@ export class CrmScriptProject{
         if(! meta){
             meta = this.createScriptForSource(path);
         }
-        let content = fs.readFileSync(absolutepath, 'utf-8')
+        let content = fs.readFileSync(absolutepath, 'utf-8') 
         meta.BaseFileHash = md5(content);
         this.saveMeta();
     }
@@ -184,6 +187,20 @@ export class CrmScriptProject{
         let name = pathName.substring(pathName.lastIndexOf('/') + 1)
         meta.FileName = name;
         return name;
+    }
+
+    private toRemoteText(cleantext){
+         //The following lines check if the convertion is reversable
+        let recover = JSON.stringify({text: cleantext})
+        let remotetext = recover.substring(8, recover.length - 1)
+        // console.log(recover)
+        // console.log(recover.substring(8, recover.length - 1) == res)
+        return remotetext
+    }
+
+    private fromRemoteText(remotetext){
+        let puretext = JSON.parse(`{"text":${remotetext}}`).text
+        return puretext
     }
 }
 
