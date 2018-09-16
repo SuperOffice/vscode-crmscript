@@ -77,6 +77,11 @@ export class CrmScriptProject{
         getScriptSource(meta, (res) =>{
             let puretext = this.fromRemoteText(res);          
             this.writeToSource(`${meta.Path}/${meta.FileName}`, puretext);
+            console.log(meta.FileName)
+            console.log(meta.BaseFileHash)
+            console.log(md5(puretext))
+            console.log(md5(res))
+            console.log(md5(this.toRemoteText(puretext)))
         });
     }
 
