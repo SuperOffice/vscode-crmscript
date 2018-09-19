@@ -130,7 +130,7 @@ export function tokenRequest(){
         apiToken = response;
         let accessToken = apiToken.accessToken
         tenant = accessToken.substring(accessToken.indexOf(':')+1, accessToken.indexOf('.'));
-        //console.log(response);
+        console.log(response);
         //console.log(tenant)
     });
 }
@@ -185,6 +185,19 @@ export function openCallBackServer() {
 
 }
 
+
+export function listAllScripts(callback: (string)=>void){
+    let options = {
+        uri: `https://sod.superoffice.com/${tenant}/api/v1/CRMScript/`,
+        headers: {
+            'Authorization': `Bearer ${apiToken.accessToken}`
+        }
+    };
+    rp(options).then((res)=>{
+        console.log(res)
+        callback(res)
+    })
+}
 
 export function getScriptSource(meta: ScriptMeta, callback: (string)=>void): string{
     if(!meta.UniqueIdentifier)

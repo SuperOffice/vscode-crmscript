@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as api from './apimockup';
-import {getScriptSource} from './api';
+import {getScriptSource, listAllScripts} from './api';
 import {uri2fspath, getCurrentFsPath} from './util';
 var md5 = require('md5');
 var fs = require('fs')
@@ -59,12 +59,14 @@ export class CrmScriptProject{
     }
 
     updateLocalMeta(){
-        let metatext = api.listAllScripts();
-        this.metas = JSON.parse(metatext);
-        this.metas.forEach((meta) =>{
-            this.composeFileName(meta)
-        })
-        this.saveMeta();
+        let metatext = listAllScripts((metatext)=>{
+            this.metas = JSON.parse(metatext);
+            this.metas.forEach((meta) =>{
+                this.composeFileName(meta)
+            })
+            this.saveMeta();
+        });
+        
     }
 
     updateAllLocalScript(){
@@ -77,11 +79,11 @@ export class CrmScriptProject{
         getScriptSource(meta, (res) =>{
             let puretext = this.fromRemoteText(res);          
             this.writeToSource(`${meta.Path}/${meta.FileName}`, puretext);
-            console.log(meta.FileName)
-            console.log(meta.BaseFileHash)
-            console.log(md5(puretext))
-            console.log(md5(res))
-            console.log(md5(this.toRemoteText(puretext)))
+            // console.log(meta.FileName)
+            // console.log(meta.BaseFileHash)
+            // console.log(md5(puretext))
+            // console.log(md5(res))
+            // console.log(md5(this.toRemoteText(puretext)))
         });
     }
 
