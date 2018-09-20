@@ -40,3 +40,7 @@ export function login(id:string, secret:string){
 export function uploadScriptSource(meta: ScriptMeta, content: string){
     vscode.window.showInformationMessage(`uploaded: ${meta.Path} with timestamp ${meta.BaseFileHash}, and content ${content}`);
 }
+
+export function createScriptAndSource(meta: ScriptMeta, content: string){
+    vscode.window.showInformationMessage(`created: ${meta.Path} with timestamp ${meta.BaseFileHash}, and content ${content}`);
+}

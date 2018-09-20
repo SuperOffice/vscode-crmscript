@@ -10,19 +10,32 @@ export function getCurrentWord(document: vscode.TextDocument, position: vscode.P
     return text.substring(i + 1, position.character);
 }
 
+export function isDot(document: vscode.TextDocument, position: vscode.Position){
+    let lastChar = document.getText(new vscode.Range(position.translate(0, -1), position));
+    return lastChar == '.'; 
+}
+
 export function getCurrentWordAtPosition(document: vscode.TextDocument, position: vscode.Position) {
     // get current word
-    let wordAtPosition = document.getWordRangeAtPosition(position);
+    let rangeWord = document.getWordRangeAtPosition(position);
     let currentWord = '';
-    if (wordAtPosition && wordAtPosition.start.character < position.character) {
-        //let word = document.getText(wordAtPosition);
-        //currentWord = word.substr(0, position.character - wordAtPosition.start.character);//Only get partial word from the beginning of the current word to the position of cursor
-        
-        //Another way: Get the whole current word having the cursor
-        currentWord = document.getText(wordAtPosition);
+    if(rangeWord && rangeWord.start.isBefore(position)){
+        currentWord = document.getText(rangeWord)
+        vscode.window.showInformationMessage(currentWord)
     }
-
     return currentWord;
+}
+    
+export function getVarType(document: vscode.TextDocument, position: vscode.Position, variable: string): string{
+    let text = document.lineAt(position).text
+    let regexp = new RegExp(`\\w+\\W+${variable}\\b`)
+    let matched = text.match(regexp)
+    if(matched){
+        let declText = matched[0]
+        let typeText = declText.match(new RegExp('\\w+\\b'))[0]
+        return typeText
+    }
+    return undefined;
 }
 
 export function createSnippetItem(info: CRMScriptIntellisense): vscode.CompletionItem {

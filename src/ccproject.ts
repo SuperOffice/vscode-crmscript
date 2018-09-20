@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import * as api from './apimockup';
-import {getScriptSource, listAllScripts} from './api';
+import {createScriptAndSource} from './apimockup';
+import {getScriptSource, listAllScripts, uploadScriptSource, getNameSpace} from './api';
 import {uri2fspath, getCurrentFsPath} from './util';
 var md5 = require('md5');
 var fs = require('fs')
@@ -58,13 +58,14 @@ export class CrmScriptProject{
         }
     }
 
-    updateLocalMeta(){
+    updateLocalMetaAndSource(){
         let metatext = listAllScripts((metatext)=>{
             this.metas = JSON.parse(metatext);
             this.metas.forEach((meta) =>{
                 this.composeFileName(meta)
             })
             this.saveMeta();
+            this.updateAllLocalScript();
         });
         
     }
@@ -77,20 +78,23 @@ export class CrmScriptProject{
 
     updateLocalScript(meta: ScriptMeta){
         getScriptSource(meta, (res) =>{
-            let puretext = this.fromRemoteText(res);          
-            this.writeToSource(`${meta.Path}/${meta.FileName}`, puretext);
-            // console.log(meta.FileName)
-            // console.log(meta.BaseFileHash)
-            // console.log(md5(puretext))
-            // console.log(md5(res))
-            // console.log(md5(this.toRemoteText(puretext)))
+            let puretext = this.fromRemoteText(res)
+            meta.BaseFileHash = md5(puretext)         
+            this.writeToSource(`${meta.Path}/${meta.FileName}`, puretext)
+            this.saveMeta()
         });
     }
 
     uploadScript(meta: ScriptMeta){
         let path = `${this.rootfolder}/${this.scriptfolder}/${meta.Path}/${meta.FileName}`;
         let content = fs.readFileSync(path, 'utf-8');
-        api.uploadScriptSource(meta, content);
+        if(meta.UniqueIdentifier){
+            if(md5(content) != meta.BaseFileHash)
+                uploadScriptSource(meta, this.toRemoteText(content));
+        }
+        else{
+
+        }
     }
 
     uploadAll(){
@@ -126,21 +130,24 @@ export class CrmScriptProject{
         if(! meta){
             meta = this.createScriptForSource(path);
         }
-        let content = fs.readFileSync(absolutepath, 'utf-8') 
-        meta.BaseFileHash = md5(content);
-        this.saveMeta();
+        //let content = fs.readFileSync(absolutepath, 'utf-8') 
+        //meta.BaseFileHash = md5(content);
+        //this.saveMeta();
     }
 
     createScriptForSource(relativepath: string){
         let lastslash = relativepath.lastIndexOf('/')
         let path = relativepath.substring(0, lastslash)
         let name = relativepath.substring(lastslash+1)
+        let namespace = getNameSpace();
+        let uid = `${getNameSpace()}.${relativepath}`.replace('/', '.').replace(' ', '_')
         let newmeta:ScriptMeta = 
         {
-            Path: relativepath, 
-            BaseFileHash: 'placeholder',
+            Path: path, 
+            BaseFileHash: 'no hash from server',
             Description: name,
-            FileName: name
+            FileName: name,
+            UniqueIdentifier: uid
         }
         this.metas.push(newmeta);
         this.saveMeta();

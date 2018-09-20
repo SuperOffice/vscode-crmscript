@@ -4,7 +4,7 @@
 import * as vscode from 'vscode';
 import {window, commands, Disposable, ExtensionContext, StatusBarAlignment, StatusBarItem, TextDocument} from 'vscode';
 import { ejScriptIntellisense } from './ejscriptIntellisense';
-import {getCurrentWord, createSnippetItem, getAPIinfo, getCurrentWordAtPosition} from './util';
+import {getCurrentWord, createSnippetItem, getAPIinfo, getCurrentWordAtPosition, isDot, getVarType} from './util';
 import {login} from './api';
 
 import * as cirrusCommands from './cirrusCommands'
@@ -79,20 +79,30 @@ class CRMScriptCompletionItemProvider implements vscode.CompletionItemProvider {
         return new Promise(
             (resolve, reject) => {                
                 let items: vscode.CompletionItem[] = [];
+                if (isDot(document, position)){
+                    let currentWord = getCurrentWordAtPosition(document, position.translate(0, -1));
+                    vscode.window.showInformationMessage(currentWord);
 
-                let currentWord = getCurrentWord(document, position);
-                vscode.window.showInformationMessage(currentWord);
-
-                //let currentWord = getCurrentWordAtPosition(document, position);
-                //vscode.window.showInformationMessage(currentWord);
-
-                let apiItems = getAPIinfo(currentWord);
-
-                for(let item of apiItems) {
-                    items.push(createSnippetItem(item));
+                    //let currentWord = getCurrentWordAtPosition(document, position);
+                    //vscode.window.showInformationMessage(currentWord);
+                    let previousLine = position
+                    while(position.line>0){
+                        previousLine = previousLine.translate(-1, 0)
+                        let typeText = getVarType(document, previousLine, currentWord);
+                        if(!typeText)
+                            continue
+                        let apiItems = getAPIinfo(typeText);
+                        if(apiItems.length == 0)
+                            continue
+                        for(let item of apiItems) {
+                            items.push(createSnippetItem(item));
+                        }
+                        resolve(items);
+                            break;
+                        
+                    }
+                    
                 }
-                
-                resolve(items);
             }
         );
     }

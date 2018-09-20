@@ -14,8 +14,7 @@ export function accumulate(){
 
 export function downloadToCurrentFolder(){
     let csProject = getProjectForCurrentFolder();
-    csProject.updateLocalMeta();
-    csProject.updateAllLocalScript();
+    csProject.updateLocalMetaAndSource();
 }
 
 export function uploadFromCurrentFolder(){

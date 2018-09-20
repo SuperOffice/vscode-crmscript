@@ -46,6 +46,7 @@ import {getCurrentFsPath} from './util'
 export interface ClientMeta{
     id: string;
     secret: string;
+    namespace: string;
 }
 
 var apiCode: string = undefined;
@@ -72,7 +73,7 @@ function initiateClient(){
         }
     }
     else{
-        this.client = {id: "<Client ID>", secret:"<ClientSecret>"};
+        this.client = {id: "<Client ID>", secret:"<ClientSecret>", namespace: "<namespace>"};
         fs.writeFile(clientfullpath, JSON.stringify(this.client, null, 2), (err)=>{
             if(err) throw err;
             vscode.commands.executeCommand('vscode.open', vscode.Uri.file(clientfullpath));
@@ -194,7 +195,7 @@ export function listAllScripts(callback: (string)=>void){
         }
     };
     rp(options).then((res)=>{
-        console.log(res)
+        //console.log(res)
         callback(res)
     })
 }
@@ -211,4 +212,28 @@ export function getScriptSource(meta: ScriptMeta, callback: (string)=>void): str
     rp(options).then((res)=>{
         callback(res)
     })
+}
+
+export function uploadScriptSource(meta: ScriptMeta, text: string){
+    let options = {
+        method: 'PUT',
+        uri: `https://sod.superoffice.com/${tenant}/api/v1/CRMScript/${meta.UniqueIdentifier}/Source`,
+        headers: {
+            'Authorization': `Bearer ${apiToken.accessToken}`,
+            'Content-Type': 'text/plain'
+        },
+        body: text
+    }
+    rp(options).then((res)=>{
+        console.log('uploaded?')
+        console.log(res)
+    }).catch((err)=>{
+        console.log(err)
+    })
+}
+
+export function getNameSpace(){
+    initiateClient();
+    return client.namespace;
+
 }
