@@ -50,7 +50,7 @@ export function onScriptFileSaved(d: vscode.TextDocument){
         return;
     }
     let ccproject = getProjectForCurrentFolder();
-    ccproject.timestampScript(path);
+    ccproject.stampSavedScript(path);
 }
 
 export function login(){

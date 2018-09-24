@@ -22,6 +22,11 @@ export interface ClientMeta{
     secret: string;
 }
 
+/**
+ * The main class to manage a CRMScript local project.
+ * A new object is created every time the follow commands are executed: Download source, upload source, and a source code file saved
+ * A new meta object is loaded from the file system when a project object is created.
+ */
 export class CrmScriptProject{
     
     existingfolders: string[] = [];
@@ -46,8 +51,7 @@ export class CrmScriptProject{
                 if(err) throw err;
                 vscode.commands.executeCommand('vscode.open', vscode.Uri.file(clientfullpath));
                 vscode.window.showWarningMessage("Please provide the client id and client secret");
-            });
-            
+            });           
         }
         if(fs.existsSync(metafullpath)){
             let content = fs.readFileSync(metafullpath);
@@ -58,6 +62,9 @@ export class CrmScriptProject{
         }
     }
 
+    /**
+     * Now it's the only opened way to download the meta information from the online tenant. In other words, if you want to update the meta information, you will get all the source code updated as well.
+     */
     updateLocalMetaAndSource(){
         let metatext = listAllScripts((metatext)=>{
             this.metas = JSON.parse(metatext);
@@ -93,7 +100,7 @@ export class CrmScriptProject{
                 uploadScriptSource(meta, this.toRemoteText(content));
         }
         else{
-
+            vscode.window.showErrorMessage(`Please provide a unique idenfier to ${meta.Path}/${meta.FileName}`)
         }
     }
 
@@ -124,10 +131,10 @@ export class CrmScriptProject{
         });
     }
 
-    timestampScript(absolutepath: string){
+    stampSavedScript(absolutepath: string){
         let path = this.getRelativeSourcePath(absolutepath)
         let meta = this.getScriptMetaFromPath(path);
-        if(! meta){
+        if(!meta){
             meta = this.createScriptForSource(path);
         }
         //let content = fs.readFileSync(absolutepath, 'utf-8') 
