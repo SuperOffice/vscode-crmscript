@@ -73,8 +73,8 @@ function initiateClient(){
         }
     }
     else{
-        this.client = {id: "<Client ID>", secret:"<ClientSecret>", namespace: "<namespace>"};
-        fs.writeFile(clientfullpath, JSON.stringify(this.client, null, 2), (err)=>{
+        client = {id: "<Client ID>", secret:"<ClientSecret>", namespace: "<namespace>"};
+        fs.writeFile(clientfullpath, JSON.stringify(client, null, 2), (err)=>{
             if(err) throw err;
             vscode.commands.executeCommand('vscode.open', vscode.Uri.file(clientfullpath));
             vscode.window.showWarningMessage("Please provide the client id and client secret");

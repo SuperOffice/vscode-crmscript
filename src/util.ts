@@ -107,6 +107,9 @@ export function uri2fspath(uri: vscode.Uri){
     if(process.platform == 'win32'){
         return uri.path.substring(1);
     }
+    else if(process.platform == 'darwin'){
+        return uri.fsPath;
+    }
     else{
         vscode.window.showErrorMessage("Platform not supported");
         return uri.fsPath;
