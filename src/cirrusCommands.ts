@@ -1,4 +1,4 @@
-import {CrmScriptProject, getProjectForCurrentFolder} from './ccproject'
+import {CrmScriptProject, getProjectForCurrentFolder} from './cirrusProject'
 import * as vscode from 'vscode';
 import {uri2fspath} from './util';
 import * as api from './api';

@@ -10,6 +10,11 @@ export function getCurrentWord(document: vscode.TextDocument, position: vscode.P
     return text.substring(i + 1, position.character);
 }
 
+/**
+ * Is the cursor stopping at a "."? Now used for auto completion
+ * @param document 
+ * @param position 
+ */
 export function isDot(document: vscode.TextDocument, position: vscode.Position){
     let lastChar = document.getText(new vscode.Range(position.translate(0, -1), position));
     return lastChar == '.'; 
@@ -21,7 +26,7 @@ export function getCurrentWordAtPosition(document: vscode.TextDocument, position
     let currentWord = '';
     if(rangeWord && rangeWord.start.isBefore(position)){
         currentWord = document.getText(rangeWord)
-        vscode.window.showInformationMessage(currentWord)
+        //vscode.window.showInformationMessage(currentWord)
     }
     return currentWord;
 }
@@ -53,6 +58,16 @@ export function createSnippetItem(info: CRMScriptIntellisense): vscode.Completio
     item.documentation = new vscode.MarkdownString(help);
 
     return item;
+}
+
+export function getFunctionInfo(typename: string, functionname: string): string{
+    let result = ejScriptIntellisense.find((value) =>{
+        return value.text == `${typename}.${functionname}`
+    })
+    if(result)
+        return result.help
+    else
+        return undefined
 }
 
 export function getAPIinfo(keyword: string): CRMScriptIntellisense[] {

@@ -3,7 +3,7 @@ const open = require('open');
 const open_darwin = require('mac-open');
 const platform = process.platform;
 import * as vscode from 'vscode'
-import {ScriptMeta} from './ccproject'
+import {ScriptMeta} from './cirrusProject'
 
 
 import { AuthorizationRequest } from "@openid/appauth/built/authorization_request";

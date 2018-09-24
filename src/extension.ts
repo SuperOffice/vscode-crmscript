@@ -4,7 +4,7 @@
 import * as vscode from 'vscode';
 import {window, commands, Disposable, ExtensionContext, StatusBarAlignment, StatusBarItem, TextDocument} from 'vscode';
 import { ejScriptIntellisense } from './ejscriptIntellisense';
-import {getCurrentWord, createSnippetItem, getAPIinfo, getCurrentWordAtPosition, isDot, getVarType} from './util';
+import {getCurrentWord, createSnippetItem, getAPIinfo, getCurrentWordAtPosition, isDot, getVarType, getFunctionInfo} from './util';
 import {login} from './api';
 
 import * as cirrusCommands from './cirrusCommands'
@@ -74,50 +74,61 @@ export function activate(context: vscode.ExtensionContext) {
     );
 }
 
+/**
+ * Auto Completion. 
+ * @todo: Only works on variables, not recursively on function calls.
+ */
 class CRMScriptCompletionItemProvider implements vscode.CompletionItemProvider {
     public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> {
-        return new Promise(
-            (resolve, reject) => {                
-                let items: vscode.CompletionItem[] = [];
-                if (isDot(document, position)){
-                    let currentWord = getCurrentWordAtPosition(document, position.translate(0, -1));
-                    vscode.window.showInformationMessage(currentWord);
+        return new Promise((resolve, reject) => {
+            let items: vscode.CompletionItem[] = [];
+            if (isDot(document, position)) {
+                let currentWord = getCurrentWordAtPosition(document, position.translate(0, -1));
+                vscode.window.showInformationMessage(currentWord);
 
-                    //let currentWord = getCurrentWordAtPosition(document, position);
-                    //vscode.window.showInformationMessage(currentWord);
-                    let previousLine = position
-                    while(position.line>0){
-                        previousLine = previousLine.translate(-1, 0)
-                        let typeText = getVarType(document, previousLine, currentWord);
-                        if(!typeText)
-                            continue
-                        let apiItems = getAPIinfo(typeText);
-                        if(apiItems.length == 0)
-                            continue
-                        for(let item of apiItems) {
-                            items.push(createSnippetItem(item));
-                        }
-                        resolve(items);
-                            break;
-                        
+                let previousLine = position
+                while (position.line > 0) {
+                    previousLine = previousLine.translate(-1, 0)
+                    let typeText = getVarType(document, previousLine, currentWord);
+                    if (!typeText)
+                        continue
+                    let apiItems = getAPIinfo(typeText);
+                    if (apiItems.length == 0)
+                        continue
+                    for (let item of apiItems) {
+                        items.push(createSnippetItem(item));
                     }
-                    
+                    resolve(items);
+                    break;
                 }
+
             }
-        );
+        });
     }
 }
 
+/**
+ * @todo: Match the function with parameters...
+ */
 class CRMScriptHoverProvider implements vscode.HoverProvider {
     public provideHover (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {		
-        //let currentWord = getCurrentWord(document, position);
-        //let info = getAPIinfo("String");
-        //let s = info[0].help;
+        let functionName = getCurrentWordAtPosition(document, position);
+        let functionStart = document.getWordRangeAtPosition(position).start;
+        let isdot = isDot(document, functionStart)
+        if(! isdot)
+            return undefined;
+        let varName = getCurrentWordAtPosition(document, functionStart.translate(0, -2))
 
-        let result: vscode.Hover = {
-            contents: [ejScriptIntellisense[0].help]//[s]
-        };
-        return result;
+        let previousLine = position
+        while (position.line > 0) {
+            previousLine = previousLine.translate(-1, 0)
+            let typeText = getVarType(document, previousLine, varName);
+            let helpText = getFunctionInfo(typeText, functionName);
+            if(helpText)
+                return new vscode.Hover(`${typeText}: ${helpText}`)
+        }
+
+        return undefined;
 	}
 }
 

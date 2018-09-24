@@ -1,4 +1,4 @@
-import {ScriptMeta} from './ccproject'
+import {ScriptMeta} from './cirrusProject'
 import * as vscode from 'vscode'
 
 var token:string = undefined;
