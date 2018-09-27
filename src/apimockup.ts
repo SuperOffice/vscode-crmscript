@@ -29,7 +29,7 @@ export function listAllScripts(): string{
 }
 
 export function getScriptSource(meta: ScriptMeta): string{
-    return `Some content for ${meta.UniqueIdentifier}`
+    return `Some content for ${meta.uniqueIdentifier}`
 }
 
 export function login(id:string, secret:string){
@@ -38,9 +38,9 @@ export function login(id:string, secret:string){
 }
 
 export function uploadScriptSource(meta: ScriptMeta, content: string){
-    vscode.window.showInformationMessage(`uploaded: ${meta.Path} with timestamp ${meta.BaseFileHash}, and content ${content}`);
+    vscode.window.showInformationMessage(`uploaded: ${meta.path} with timestamp ${meta.baseFileHash}, and content ${content}`);
 }
 
 export function createScriptAndSource(meta: ScriptMeta, content: string){
-    vscode.window.showInformationMessage(`created: ${meta.Path} with timestamp ${meta.BaseFileHash}, and content ${content}`);
+    vscode.window.showInformationMessage(`created: ${meta.path} with timestamp ${meta.baseFileHash}, and content ${content}`);
 }

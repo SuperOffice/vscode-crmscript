@@ -3,7 +3,7 @@ const open = require('open');
 const open_darwin = require('mac-open');
 const platform = process.platform;
 import * as vscode from 'vscode'
-import {ScriptMeta} from './cirrusProject'
+import {ScriptMeta, CrmScriptProject} from './cirrusProject'
 
 
 import { AuthorizationRequest } from "@openid/appauth/built/authorization_request";
@@ -132,7 +132,7 @@ export function tokenRequest(){
         let accessToken = apiToken.accessToken
         tenant = accessToken.substring(accessToken.indexOf(':')+1, accessToken.indexOf('.'));
         console.log(response);
-        //console.log(tenant)
+        console.log(tenant)
     });
 }
 
@@ -191,42 +191,55 @@ export function listAllScripts(callback: (string)=>void){
     let options = {
         uri: `https://sod.superoffice.com/${tenant}/api/v1/CRMScript/`,
         headers: {
-            'Authorization': `Bearer ${apiToken.accessToken}`
+            'Authorization': `Bearer ${apiToken.accessToken}`,
+            'Accept': 'application/json'
         }
     };
     rp(options).then((res)=>{
         //console.log(res)
-        callback(res)
+        let values = JSON.stringify(JSON.parse(res).value)
+        callback(values)
     })
 }
 
 export function getScriptSource(meta: ScriptMeta, callback: (string)=>void): string{
-    if(!meta.UniqueIdentifier)
+    if(!meta.uniqueIdentifier)
         return undefined;
     let options = {
-        uri: `https://sod.superoffice.com/${tenant}/api/v1/CRMScript/${meta.UniqueIdentifier}/Source`,
+        uri: `https://sod.superoffice.com/${tenant}/api/v1/CRMScript/${meta.uniqueIdentifier}`,
         headers: {
-            'Authorization': `Bearer ${apiToken.accessToken}`
+            'Authorization': `Bearer ${apiToken.accessToken}`,
+            'Accept': 'application/json'
         }
     };
     rp(options).then((res)=>{
-        callback(res)
+        let sourcecode = JSON.parse(res).Source
+        callback(sourcecode)
     })
 }
 
-export function uploadScriptSource(meta: ScriptMeta, text: string){
+export function uploadScriptSource(meta: ScriptMeta, text: string, post: (res: any)=>void){
+    //@todo!!
     let options = {
         method: 'PUT',
-        uri: `https://sod.superoffice.com/${tenant}/api/v1/CRMScript/${meta.UniqueIdentifier}/Source`,
+        uri: `https://sod.superoffice.com/${tenant}/api/v1/CRMScript/${meta.uniqueIdentifier}`,
         headers: {
             'Authorization': `Bearer ${apiToken.accessToken}`,
-            'Content-Type': 'text/plain'
+            'Content-Type': 'application/json'
         },
-        body: text
+        body: {
+            Source: text,
+            UniqueIdentifier: meta.uniqueIdentifier,
+            Name: meta.name,
+            Description: meta.description,
+            IncludeId: meta.includeId,
+            Path: meta.path
+        },
+        json: true
     }
     rp(options).then((res)=>{
-        console.log('uploaded?')
-        console.log(res)
+        if(post)
+            post(res)
     }).catch((err)=>{
         console.log(err)
     })

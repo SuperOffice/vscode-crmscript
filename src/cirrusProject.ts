@@ -7,14 +7,22 @@ var fs = require('fs')
 
 
 export interface ScriptMeta {
-    EjscriptId?: number,
-    UniqueIdentifier?: string,
-    Description: string,
-    LongDescription?: string,
-    IncludeId?: string,
-    Path: string,
-    FileName?: string,
-    BaseFileHash: string
+    registeredDate?: string,
+    updatedDate?: string,
+    uniqueIdentifier?: string,
+    description?: string,
+    path: string,
+    name?: string,
+    includeId?: string,
+    accessKey?: string,
+    PrimaryKey?: string,
+    hierarchyFullname?: string,
+    htmlOutput?: boolean,
+    extraMenuId?: number,
+    ejscriptId?: number,
+    hierarchyId?: number,
+    fileName?:string,
+    baseFileHash?: string
 }
 
 export interface ClientMeta{
@@ -85,23 +93,27 @@ export class CrmScriptProject{
 
     updateLocalScript(meta: ScriptMeta){
         getScriptSource(meta, (res) =>{
-            let puretext = this.fromRemoteText(res)
-            meta.BaseFileHash = md5(puretext)         
-            this.writeToSource(`${meta.Path}/${meta.FileName}`, puretext)
+            //let puretext = this.fromRemoteText(res)
+            let puretext = res
+            meta.baseFileHash = md5(puretext)         
+            this.writeToSource(`${meta.path}/${meta.fileName}`, puretext)
             this.saveMeta()
         });
     }
 
     uploadScript(meta: ScriptMeta){
-        let path = `${this.rootfolder}/${this.scriptfolder}/${meta.Path}/${meta.FileName}`;
+        let path = `${this.rootfolder}/${this.scriptfolder}/${meta.path}/${meta.fileName}`;
         let content = fs.readFileSync(path, 'utf-8');
-        if(meta.UniqueIdentifier){
-            if(md5(content) != meta.BaseFileHash)
-                uploadScriptSource(meta, this.toRemoteText(content));
-        }
-        else{
-            vscode.window.showErrorMessage(`Please provide a unique idenfier to ${meta.Path}/${meta.FileName}`)
-        }
+        
+        let newhash = md5(content)
+        if(newhash != meta.baseFileHash)
+            //uploadScriptSource(meta, this.toRemoteText(content));
+            uploadScriptSource(meta, content, (res)=>{
+                meta.uniqueIdentifier = res.UniqueIdentifier
+                meta.baseFileHash = md5(res.Source)
+                this.saveMeta()
+            })
+    
     }
 
     uploadAll(){
@@ -125,7 +137,7 @@ export class CrmScriptProject{
 
     getScriptMetaFromPath(path: string){
         return this.metas.find((meta) => {
-            let metapathname = `${meta.Path}/${meta.FileName}`;
+            let metapathname = `${meta.path}/${meta.fileName}`;
             let res = (metapathname == path); 
             return res;
         });
@@ -145,16 +157,16 @@ export class CrmScriptProject{
     createScriptForSource(relativepath: string){
         let lastslash = relativepath.lastIndexOf('/')
         let path = relativepath.substring(0, lastslash)
-        let name = relativepath.substring(lastslash+1)
+        let fileName = relativepath.substring(lastslash+1)
+        let name = fileName.substring(0, fileName.lastIndexOf('.'));
         let namespace = getNameSpace();
-        let uid = `${getNameSpace()}.${relativepath}`.replace('/', '.').replace(' ', '_')
+        //let uid = `${getNameSpace()}.${relativepath}`.replace('/', '.').replace(' ', '_')
         let newmeta:ScriptMeta = 
         {
-            Path: path, 
-            BaseFileHash: 'no hash from server',
-            Description: name,
-            FileName: name,
-            UniqueIdentifier: uid
+            path: path, 
+            baseFileHash: 'no hash from server',
+            name: name,
+            fileName: fileName
         }
         this.metas.push(newmeta);
         this.saveMeta();
@@ -195,7 +207,9 @@ export class CrmScriptProject{
 
     private fileNameCounts: {[id: string]: number} = {};
     private composeFileName(meta: ScriptMeta){
-        let pathNameNoExt = `${meta.Path}/${meta.Description}`;
+        if(meta.path.endsWith("/"))
+            meta.path = meta.path.substring(0, meta.path.length-1)
+        let pathNameNoExt = `${meta.path}/${meta.name}`;
         let count: number = 0;
         let postfix = "";
         if(this.fileNameCounts[pathNameNoExt]){
@@ -206,7 +220,7 @@ export class CrmScriptProject{
         this.fileNameCounts[pathNameNoExt] = count;
         let pathName = `${pathNameNoExt}${postfix}.crmscript`;
         let name = pathName.substring(pathName.lastIndexOf('/') + 1)
-        meta.FileName = name;
+        meta.fileName = name;
         return name;
     }
 
