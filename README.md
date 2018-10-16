@@ -9,7 +9,9 @@ An offline IDE for customising SuperOffice CRM with its CRMScript langange
     * Download/update CRMScripts from the remote tenant into a local project. Command "Cirrus: Download scripts to the current folder". NB: Your local changes may be overwritten.
     * Editing the meta-information and script source code
     * Create new scripts inside the local project
+    * Delete a script
     * Upload scripts into the tenant. Command "Cirrus: Upload all in the current folder".
+    * Execute the Script opened in the current editor. Command "Cirrus: Execute the current script". Results will be shown in OUTPUT->CRMSCript
 - CRMScript editor
     * Syntax highlighting
     * Auto-completion of variables with candidate functions
@@ -23,7 +25,7 @@ An offline IDE for customising SuperOffice CRM with its CRMScript langange
 
 # Install
 
-- ```git clone https://huis@bitbucket.org/cirrusproject/vscode-crmscript.git```
+- ```git clone https://github.com/SuperOffice/vscode-crmscript```
 - ```cd vscode-crmscript```
 - ```npm install```
 - Open VS Code from this folder (e.g., ```code .```) 

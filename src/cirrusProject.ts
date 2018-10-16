@@ -116,6 +116,7 @@ export class CrmScriptProject{
         if(newhash != meta.baseFileHash)
             //uploadScriptSource(meta, this.toRemoteText(content));
             uploadScriptSource(meta, content, (res)=>{
+                console.log(res)
                 meta.uniqueIdentifier = res.UniqueIdentifier
                 meta.baseFileHash = md5(res.Source)
                 this.saveMeta()

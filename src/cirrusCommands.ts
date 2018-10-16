@@ -75,6 +75,10 @@ export function executeCurrentScript(){
         vscode.window.showErrorMessage("The active editor is not for a valid CRMScript")
         return
     }
+    if(!meta.ejscriptId){
+        vscode.window.showErrorMessage("Please download the latest scripts before execution")
+        return
+    }
     api.executeScript(meta, (res)=>{
         if(!outputchannel)
             outputchannel = vscode.window.createOutputChannel("CRMScript")
