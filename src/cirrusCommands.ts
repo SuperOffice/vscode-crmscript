@@ -58,6 +58,9 @@ export function onScriptFileSaved(d: vscode.TextDocument){
 export function login(){
     api.openCallBackServer();
     api.login()
+    if(!outputchannel)
+        outputchannel = vscode.window.createOutputChannel("CRMScript")
+    outputchannel.appendLine("Login Successful")
 }
 
 export function executeCurrentScript(){
