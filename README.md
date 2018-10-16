@@ -35,15 +35,3 @@ An offline IDE for customising SuperOffice CRM with its CRMScript langange
 - Download vsix package: https://github.com/SuperOffice/vscode-crmscript/releases/download/0.0.1/crmscript-0.0.1.vsix
 - Open VS Code, run command "Extensions: Install from VSIX"
 
-# Devlopment
-
-Code highlighting for CRMSCript. 
-
-The language grammars (tokens) can be defined using TextMate. 
-http://manual.macromates.com/en/language_grammars
-and/or http://docs.sublimetext.info/en/latest/extensibility/syntaxdefs.html 
-http://docs.sublimetext.info/en/latest/reference/syntaxdefs.html 
-
-The language themes can be defined in  .tmTheme
-https://code.visualstudio.com/docs/extensions/themes-snippets-colorizers 
-
