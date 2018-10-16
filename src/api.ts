@@ -59,6 +59,8 @@ const clientfile = 'client.json'
 const requestor = new NodeRequestor();
 var configuration: AuthorizationServiceConfiguration = undefined;
 
+var loginStatusBarItem: vscode.StatusBarItem = undefined;
+
 function initiateClient(){
     let clientfullpath = `${getCurrentFsPath()}/${clientfile}`;
     if(fs.existsSync(clientfullpath)){
@@ -130,9 +132,16 @@ export function tokenRequest(){
     .then(response => {
         apiToken = response;
         let accessToken = apiToken.accessToken
-        tenant = accessToken.substring(accessToken.indexOf(':')+1, accessToken.indexOf('.'));
-        console.log(response);
+        tenant = accessToken.substring(accessToken.indexOf(':')+1, accessToken.indexOf('.'))
+        console.log(response)
         console.log(tenant)
+
+        //@todo: move this out of the api...
+        if(!loginStatusBarItem){
+            loginStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100)
+        }
+        loginStatusBarItem.text = `Logged in to ${tenant}`
+        loginStatusBarItem.show()
     });
 }
 
@@ -189,7 +198,7 @@ export function openCallBackServer() {
 
 export function listAllScripts(callback: (string)=>void){
     let options = {
-        uri: `https://sod.superoffice.com/${tenant}/api/v1/CRMScript/`,
+        uri: `https://sod.superoffice.com/${tenant}/api/v1/Script/`,
         headers: {
             'Authorization': `Bearer ${apiToken.accessToken}`,
             'Accept': 'application/json'
@@ -206,7 +215,7 @@ export function getScriptSource(meta: ScriptMeta, callback: (string)=>void): str
     if(!meta.uniqueIdentifier)
         return undefined;
     let options = {
-        uri: `https://sod.superoffice.com/${tenant}/api/v1/CRMScript/${meta.uniqueIdentifier}`,
+        uri: `https://sod.superoffice.com/${tenant}/api/v1/Script/${meta.uniqueIdentifier}`,
         headers: {
             'Authorization': `Bearer ${apiToken.accessToken}`,
             'Accept': 'application/json'
@@ -222,7 +231,7 @@ export function uploadScriptSource(meta: ScriptMeta, text: string, post: (res: a
     //@todo!!
     let options = {
         method: 'PUT',
-        uri: `https://sod.superoffice.com/${tenant}/api/v1/CRMScript/${meta.uniqueIdentifier}`,
+        uri: `https://sod.superoffice.com/${tenant}/api/v1/Script/${meta.uniqueIdentifier}`,
         headers: {
             'Authorization': `Bearer ${apiToken.accessToken}`,
             'Content-Type': 'application/json'
@@ -245,8 +254,30 @@ export function uploadScriptSource(meta: ScriptMeta, text: string, post: (res: a
     })
 }
 
+export function deleteScript(meta: ScriptMeta, post: (res: any)=>void){
+    //@todo!!
+    let options = {
+        method: 'DELETE',
+        uri: `https://sod.superoffice.com/${tenant}/api/v1/Script/${meta.uniqueIdentifier}`,
+        headers: {
+            'Authorization': `Bearer ${apiToken.accessToken}`,
+            'Content-Type': 'application/json'
+        }
+    }
+    rp(options).then((res)=>{
+        if(post)
+            post(res)
+    }).catch((err)=>{
+        console.log(err)
+    })
+}
+
 export function getNameSpace(){
     initiateClient();
     return client.namespace;
 
+}
+
+export function getTenant(){
+    return tenant
 }

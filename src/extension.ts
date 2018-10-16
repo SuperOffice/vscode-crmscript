@@ -72,6 +72,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.languages.registerHoverProvider(
                     CRMSCRIPT_MODE, new CRMScriptHoverProvider())
     );
+
 }
 
 /**
@@ -84,7 +85,6 @@ class CRMScriptCompletionItemProvider implements vscode.CompletionItemProvider {
             let items: vscode.CompletionItem[] = [];
             if (isDot(document, position)) {
                 let currentWord = getCurrentWordAtPosition(document, position.translate(0, -1));
-                vscode.window.showInformationMessage(currentWord);
 
                 let previousLine = position
                 while (position.line > 0) {

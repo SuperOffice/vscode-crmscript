@@ -26,7 +26,6 @@ export function getCurrentWordAtPosition(document: vscode.TextDocument, position
     let currentWord = '';
     if(rangeWord && rangeWord.start.isBefore(position)){
         currentWord = document.getText(rangeWord)
-        //vscode.window.showInformationMessage(currentWord)
     }
     return currentWord;
 }

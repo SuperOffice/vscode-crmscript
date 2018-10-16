@@ -1,10 +1,9 @@
 import * as vscode from 'vscode';
 import {createScriptAndSource} from './apimockup';
-import {getScriptSource, listAllScripts, uploadScriptSource, getNameSpace} from './api';
+import {getScriptSource, listAllScripts, uploadScriptSource, getNameSpace, deleteScript} from './api';
 import {uri2fspath, getCurrentFsPath} from './util';
 var md5 = require('md5');
 var fs = require('fs')
-
 
 export interface ScriptMeta {
     registeredDate?: string,
@@ -103,6 +102,14 @@ export class CrmScriptProject{
 
     uploadScript(meta: ScriptMeta){
         let path = `${this.rootfolder}/${this.scriptfolder}/${meta.path}/${meta.fileName}`;
+
+        if(!fs.existsSync(path)){
+            deleteScript(meta, (res)=>{
+                console.log(res)
+            })
+            return
+        }
+
         let content = fs.readFileSync(path, 'utf-8');
         
         let newhash = md5(content)
@@ -119,6 +126,17 @@ export class CrmScriptProject{
     uploadAll(){
         this.metas.forEach((meta)=>{
             this.uploadScript(meta);
+        })
+    }
+
+    deleteEmptyScripts(){
+        this.metas.forEach((meta)=>{
+            let path = `${this.rootfolder}/${this.scriptfolder}/${meta.path}/${meta.fileName}`;
+            if(!fs.existsSync(path)){
+                deleteScript(meta, (res)=>{
+                    console.log(res)
+                })
+            }
         })
     }
 
