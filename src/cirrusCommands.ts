@@ -7,6 +7,8 @@ var fs = require('fs')
 
 var count = 1;
 
+var outputchannel:vscode.OutputChannel = undefined;
+
 export function accumulate(){
     count = count + 1;
     console.log(count.toString());
@@ -56,4 +58,28 @@ export function onScriptFileSaved(d: vscode.TextDocument){
 export function login(){
     api.openCallBackServer();
     api.login()
+}
+
+export function executeCurrentScript(){
+    let ccproject = getProjectForCurrentFolder();
+    let editor = vscode.window.activeTextEditor;
+    if(!editor){
+        vscode.window.showErrorMessage("No script is opened")
+        return
+    }
+    let meta = ccproject.getScriptMetaFromAbsolutePath(uri2fspath(editor.document.uri))
+    if(!meta){
+        vscode.window.showErrorMessage("The active editor is not for a valid CRMScript")
+        return
+    }
+    api.executeScript(meta, (res)=>{
+        if(!outputchannel)
+            outputchannel = vscode.window.createOutputChannel("CRMScript")
+        let pureres =  JSON.parse(`{"text":${res}}`).text
+        outputchannel.appendLine("")
+        outputchannel.appendLine("")
+        let date = new Date()
+        outputchannel.appendLine(`====<${meta.fileName}> ${date.toLocaleString()}====`)
+        outputchannel.append(pureres)
+    });
 }

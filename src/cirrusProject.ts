@@ -161,6 +161,11 @@ export class CrmScriptProject{
         });
     }
 
+    getScriptMetaFromAbsolutePath(absolutepath: string){
+        let path = this.getRelativeSourcePath(absolutepath)
+        return this.getScriptMetaFromPath(path)
+    }
+
     stampSavedScript(absolutepath: string){
         let path = this.getRelativeSourcePath(absolutepath)
         let meta = this.getScriptMetaFromPath(path);

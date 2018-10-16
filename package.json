@@ -35,6 +35,10 @@
             {
                 "command": "cirrus.uploadAllInFolder",
                 "title": "Cirrus: Upload all in the current folder"
+            },
+            {
+                "command": "cirrus.executeScript",
+                "title": "Cirrus: Execute the current Script"
             }
         ],
         "languages": [

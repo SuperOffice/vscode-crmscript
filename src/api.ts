@@ -275,6 +275,22 @@ export function deleteScript(meta: ScriptMeta, post: (res: any)=>void){
     })
 }
 
+export function executeScript(meta:ScriptMeta, post: (res: any)=>void){
+    let options = {
+        uri: `https://sod.superoffice.com/${tenant}/api/v1/CRMScript/${meta.ejscriptId}/Execute`,
+        headers: {
+            'Authorization': `Bearer ${apiToken.accessToken}`,
+            'Content-Type': 'application/json'
+        }
+    }
+    rp(options).then((res)=>{
+        if(post)
+            post(res)
+    }).catch((err)=>{
+        console.log(err)
+    })
+}
+
 export function getNameSpace(){
     initiateClient();
     return client.namespace;
