@@ -4,6 +4,7 @@ const open_darwin = require('mac-open');
 const platform = process.platform;
 import * as vscode from 'vscode'
 import {ScriptMeta, CrmScriptProject} from './cirrusProject'
+import {responseString} from './loginpage'
 
 
 import { AuthorizationRequest } from "@openid/appauth/built/authorization_request";
@@ -181,7 +182,7 @@ class HelloService {
         apiCode = code;
         //console.log(code);
         tokenRequest();
-        return `Login successfully. Happy Scripting!`;
+        return responseString;
     }
 }
 export function openCallBackServer() {
@@ -231,7 +232,7 @@ export function uploadScriptSource(meta: ScriptMeta, text: string, post: (res: a
     //@todo!!
     let options = {
         method: 'PUT',
-        uri: `https://sod.superoffice.com/${tenant}/api/v1/Script/${meta.uniqueIdentifier}`,
+        uri: `https://sod.superoffice.com/${tenant}/api/v1/Script/${meta.uniqueIdentifier?meta.uniqueIdentifier:""}`,
         headers: {
             'Authorization': `Bearer ${apiToken.accessToken}`,
             'Content-Type': 'application/json'
@@ -246,6 +247,8 @@ export function uploadScriptSource(meta: ScriptMeta, text: string, post: (res: a
         },
         json: true
     }
+    if (!options.body.UniqueIdentifier)
+        delete options.body.UniqueIdentifier
     rp(options).then((res)=>{
         if(post)
             post(res)
