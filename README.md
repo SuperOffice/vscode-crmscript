@@ -34,5 +34,5 @@ An offline IDE for customising SuperOffice CRM with its CRMScript language.
 # Install from binary
 - Download vsix package: https://github.com/SuperOffice/vscode-crmscript/releases/download/0.0.1/crmscript-0.0.1.vsix
 - Open VS Code, run command "Extensions: Install from VSIX"
-  * Alternatively open Extensions (Ctrl+Shift+X), use Actions-menu at top of Explorer panel, and choose "Install from VSIX..."
+  * Alternatively open Extensions (Ctrl+Shift+X), use Actions-menu at top of Extensions panel, and choose "Install from VSIX..."
 
