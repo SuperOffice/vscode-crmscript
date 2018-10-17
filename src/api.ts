@@ -87,6 +87,15 @@ function initiateClient(){
     return undefined;
 }
 
+export function initApi(){
+    if(!loginStatusBarItem){
+        loginStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100)
+    }
+    loginStatusBarItem.command = "cirrus.login"
+    loginStatusBarItem.text = "Click to login"
+    loginStatusBarItem.show()
+}
+
 
 //var configuration: AuthorizationServiceConfiguration | undefined;
 export function login(){
@@ -142,6 +151,7 @@ export function tokenRequest(){
             loginStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100)
         }
         loginStatusBarItem.text = `Logged in to ${tenant}`
+        loginStatusBarItem.command = undefined
         loginStatusBarItem.show()
     });
 }

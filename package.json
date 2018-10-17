@@ -38,7 +38,7 @@
             },
             {
                 "command": "cirrus.executeScript",
-                "title": "Cirrus: Execute the current Script"
+                "title": "Cirrus: Execute Script"
             }
         ],
         "languages": [
@@ -81,7 +81,14 @@
                 "uiTheme": "vs-dark",
                 "path": "./themes/Sample_Dark.tmTheme"
             }
-        ]
+        ],
+        "menus": {
+            "editor/title/context": [{
+                "when": "resourceLangId == crmscript",
+                "command": "cirrus.executeScript",
+                "group": "navigation"
+            }]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

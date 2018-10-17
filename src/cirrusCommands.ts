@@ -90,3 +90,7 @@ export function executeCurrentScript(){
         outputchannel.append(pureres)
     });
 }
+
+export function init(){
+    api.initApi();
+}

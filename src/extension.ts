@@ -73,7 +73,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.languages.registerHoverProvider(
                     CRMSCRIPT_MODE, new CRMScriptHoverProvider())
     );
-
+    cirrusCommands.init()
 }
 
 /**
