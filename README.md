@@ -1,11 +1,11 @@
 # CRMScript IDE
 
-An offline IDE for customising SuperOffice CRM with its CRMScript langange
+An offline IDE for customising SuperOffice CRM with its CRMScript language.
 
 # Features
 
 - Project management
-    * Login to your online tenant of SuperOffice to get access to the scripts. Command "Cirrus: Login"
+    * Login to your online tenant of SuperOffice to get access to the scripts. Command "Cirrus: Login" (Ctrl+Shift+P to open commandline)
     * Download/update CRMScripts from the remote tenant into a local project. Command "Cirrus: Download scripts to the current folder". NB: Your local changes may be overwritten.
     * Editing the meta-information and script source code
     * Create new scripts inside the local project
@@ -29,9 +29,10 @@ An offline IDE for customising SuperOffice CRM with its CRMScript langange
 - ```cd vscode-crmscript```
 - ```npm install```
 - Open VS Code from this folder (e.g., ```code .```) 
-- Debug -> Start Debuging (F5)
+- Debug -> Start Debugging (F5)
 
 # Install from binary
 - Download vsix package: https://github.com/SuperOffice/vscode-crmscript/releases/download/0.0.1/crmscript-0.0.1.vsix
 - Open VS Code, run command "Extensions: Install from VSIX"
+  * Alternatively open Extensions (Ctrl+Shift+X), use Actions-menu at top of Explorer panel, and choose "Install from VSIX..."
 
