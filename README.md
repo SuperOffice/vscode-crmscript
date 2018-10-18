@@ -36,3 +36,16 @@ An offline IDE for customising SuperOffice CRM with its CRMScript language.
 - Open VS Code, run command "Extensions: Install from VSIX"
   * Alternatively open Extensions (Ctrl+Shift+X), use Actions-menu at top of Extensions panel, and choose "Install from VSIX..."
 
+# Quick start
+In Visual Studio Code (with the CRMScript extension):
+- Open an empty folder (File -> Open Folder...)
+- Create a file named "client.json" in this folder
+- Write the following content into that file. The Client ID and Client Secret are specific to the tenant and can be found online. 
+```json
+{
+    "id": "<Client ID>",
+    "secret": "<Client Secret>"
+}
+```
+- Login. Command: "Cirrus: Login"
+- Download the default system scripts. Command: "Cirrus: Download scripts to the current folder" 
