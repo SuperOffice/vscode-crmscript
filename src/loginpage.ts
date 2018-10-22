@@ -103,4 +103,4 @@ let logo = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 </svg>
 `
 
-export var responseString = `<html><head><meta http-equiv='refresh' content='10;url=https://community.superoffice.com'></head><style>body {{background-color: white;}} h1 {{ color: red; margin-left: 40px; }}</style><body><h1>Welcome to...</h1>${logo}</body></html>`
+export var responseString = `<html><head><meta http-equiv='refresh' content='10;url=https://sod.superoffice.com'></head><style>body {{background-color: white;}} h1 {{ color: red; margin-left: 40px; }}</style><body><h1>Welcome to...</h1>${logo}</body></html>`
