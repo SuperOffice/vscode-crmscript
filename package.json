@@ -83,11 +83,13 @@
             }
         ],
         "menus": {
-            "editor/title/context": [{
-                "when": "resourceLangId == crmscript",
-                "command": "cirrus.executeScript",
-                "group": "navigation"
-            }]
+            "editor/title/context": [
+                {
+                    "when": "resourceLangId == crmscript",
+                    "command": "cirrus.executeScript",
+                    "group": "navigation"
+                }
+            ]
         }
     },
     "scripts": {

@@ -291,8 +291,10 @@ export function executeScript(meta:ScriptMeta, post: (res: any)=>void){
         headers: {
             'Authorization': `Bearer ${apiToken.accessToken}`,
             'Content-Type': 'application/json'
-        }
-    }
+        },
+        body:{},
+        json:true
+      }
     rp(options).then((res)=>{
         if(post)
             post(res)
