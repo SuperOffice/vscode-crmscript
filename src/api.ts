@@ -259,6 +259,7 @@ export function uploadScriptSource(meta: ScriptMeta, text: string, post: (res: a
     }
     if (!options.body.UniqueIdentifier)
         delete options.body.UniqueIdentifier
+    console.log(`upload ${options.uri}`);
     rp(options).then((res)=>{
         if(post)
             post(res)
@@ -291,10 +292,9 @@ export function executeScript(meta:ScriptMeta, post: (res: any)=>void){
         headers: {
             'Authorization': `Bearer ${apiToken.accessToken}`,
             'Content-Type': 'application/json'
-        },
-        body:{},
-        json:true
-      }
+        }
+    }
+    console.log(options.uri)
     rp(options).then((res)=>{
         if(post)
             post(res)
