@@ -1,6 +1,14 @@
 #setLanguageLevel 3;
+#include "somescript";
 
-//comments
+//Single line comment
+
+/*
+ * This is a 
+ * multiline 
+ * comment
+ */
+
 Void sayHello(String name)
 {
   printLine("Hello " + name);

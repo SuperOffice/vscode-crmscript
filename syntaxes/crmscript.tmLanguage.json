@@ -1438,14 +1438,14 @@
 			"name": "constant.other.symbol.crmscript"
 		},
 		{
-			"begin": "^//",
+			"begin": "/\\*",
 			"captures": {
 				"0": {
 					"name": "punctuation.definition.comment.crmscript"
 				}
 			},
 			"comment": "multiline comments",
-			"end": "\\n",
+			"end": "\\*/",
 			"name": "comment.block.documentation.crmscript"
 		},
 		{
