@@ -86,13 +86,13 @@
 		},
 		{
 			"comment": "everything being a reserved word, not a value and needing a 'end' is a..",
-			"match": "(?<!\\.)\\b(class|for|else|until|if|while|struct|setLanguageLevel)\\b(?![?!])",
+			"match": "(?<!\\.)\\b(class|catch|for|else|until|if|while|return|struct|setLanguageLevel|this|try)\\b(?![?!])",
 			"name": "keyword.control.crmscript"
 		},
 		{
 			"comment": "built in CRMScript classes",
 			"match": "(?<!\\.)\\b(Attachment|Bool|Byte|Cache|Category|Company|Customer|Date|DateTime|EventData|ExtraTable|FHBitSet|File|JSONBuilder|HTTP|Integer|MainMenu|Map|Notify|NSAssociate|NSContact|NSContactAgent|NSContactEntity|NSMDOAgent|NSPerson|NSPersonEntity|NSProject|NSProjectAgent|NSProjectEntity|NSSale|NSSaleAgent|NSSaleEntity|Parser|ReplyTemplate|SearchEngine|Ticket|User|Vector)\\b(?![?!])",
-			"name": "class.type.crmscript"
+			"name": "storage.type.crmscript"
 		},
 		{
 			"comment": "contextual smart pair support for block parameters",

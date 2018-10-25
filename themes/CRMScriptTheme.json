@@ -75,13 +75,14 @@
 				"storage.type.variable.crmscript"
 			],
 			"settings": {
-				"foreground": "#c40e63"
+				"foreground": "#c586c0"
 			}
 		},
 		{
 			"name": "CRMScriptClass",
 			"scope": [
-				"class.type.crmscript"
+				"storage.type.crmscript",
+				"variable.other.constant.crmscript"
 			],
 			"settings": {
 				"foreground": "#4ec9b0"
