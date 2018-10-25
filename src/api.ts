@@ -206,7 +206,6 @@ export function openCallBackServer() {
 
 }
 
-
 export function listAllScripts(callback: (string)=>void){
     let options = {
         uri: `https://sod.superoffice.com/${tenant}/api/v1/Script/`,
@@ -216,9 +215,10 @@ export function listAllScripts(callback: (string)=>void){
         }
     };
     rp(options).then((res)=>{
-        //console.log(res)
         let values = JSON.stringify(JSON.parse(res).value)
         callback(values)
+    }).catch((err) => {
+        console.error('Error:', err)
     })
 }
 
@@ -235,6 +235,8 @@ export function getScriptSource(meta: ScriptMeta, callback: (string)=>void): str
     rp(options).then((res)=>{
         let sourcecode = JSON.parse(res).Source
         callback(sourcecode)
+    }).catch(err => {
+        console.error('ERROR: ', err)
     })
 }
 
