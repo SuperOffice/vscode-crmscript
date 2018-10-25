@@ -19,7 +19,7 @@
 				"punctuation.definition.comment.crmscript"
 			],
 			"settings": {
-				"foreground": "#6d6d6d",
+				"foreground": "#7a7b7c",
 				"fontStyle": "italic"
 			}
 		},
@@ -31,7 +31,7 @@
 				"punctuation.definition.string.end.crmscript"
 			],
 			"settings": {
-				"foreground": "#83df7a"
+				"foreground": "#2b4"
 			}
 		},
 		{
@@ -41,7 +41,7 @@
 				"constant.numeric.crmscript"
 			],
 			"settings": {
-				"foreground": "#970af5"
+				"foreground": "#EE82EE"
 			}
 		},
 		{
@@ -76,6 +76,24 @@
 			],
 			"settings": {
 				"foreground": "#c40e63"
+			}
+		},
+		{
+			"name": "CRMScriptClass",
+			"scope": [
+				"class.type.crmscript"
+			],
+			"settings": {
+				"foreground": "#4ec9b0"
+			}
+		},
+		{
+			"name": "Other",
+			"scope": [
+				"source.crmscript"
+			],
+			"settings": {
+				"foreground": "#abcdef"
 			}
 		}
 	]
