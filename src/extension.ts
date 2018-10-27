@@ -103,6 +103,8 @@ class CRMScriptCompletionItemProvider implements vscode.CompletionItemProvider {
                     break;
                 }
 
+            } else {
+                resolve();
             }
         });
     }
@@ -113,6 +115,7 @@ class CRMScriptCompletionItemProvider implements vscode.CompletionItemProvider {
  */
 class CRMScriptHoverProvider implements vscode.HoverProvider {
     public provideHover (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {		
+        console.log('CRMScriptHoverProvider')
         let functionName = getCurrentWordAtPosition(document, position);
         let functionStart = document.getWordRangeAtPosition(position).start;
         let isdot = isDot(document, functionStart)
