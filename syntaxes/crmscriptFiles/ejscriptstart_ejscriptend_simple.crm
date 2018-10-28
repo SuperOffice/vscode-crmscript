@@ -1,0 +1,7 @@
+%EJSCRIPT_START%
+<%
+  for (Integer i = 0; i < 10; i++) {
+    printLine("<li>" + i.toString() + "</li>");
+  }
+%>
+%EJSCRIPT_END%

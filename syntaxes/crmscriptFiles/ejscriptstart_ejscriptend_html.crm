@@ -1,0 +1,16 @@
+%EJSCRIPT_START%
+  
+  <h1>HTML and CRMScript example</h1>
+  <ul>
+  
+<%
+ 
+  for (Integer i = 0; i < 10; i++) {
+    printLine("<li>" + i.toString() + "</li>");
+  }
+  
+%>
+  
+  </ul>
+  
+%EJSCRIPT_END%
