@@ -25,7 +25,7 @@ export function uploadFromCurrentFolder(){
 }
 
 export function createProject(){
-    
+
     let result = vscode.window.showOpenDialog({
         canSelectFiles: false,
         canSelectFolders: true
@@ -36,14 +36,14 @@ export function createProject(){
         }
         let path = uri2fspath(uris[0]);
         if(!fs.existsSync(path)){
-            fs.mkdirSync(path);     
+            fs.mkdirSync(path);
             console.log("folder created");
         }
         vscode.commands.executeCommand('vscode.openFolder', uris[0]).then(()=>{
             downloadToCurrentFolder();
         })
     })
-    
+
 }
 
 export function onScriptFileSaved(d: vscode.TextDocument){
@@ -56,11 +56,20 @@ export function onScriptFileSaved(d: vscode.TextDocument){
 }
 
 export function login(){
-    api.openCallBackServer();
-    api.login()
-    if(!outputchannel)
-        outputchannel = vscode.window.createOutputChannel("CRMScript")
-    outputchannel.appendLine("Login Successful")
+    api.login().then(() => {
+        if(!outputchannel)
+            outputchannel = vscode.window.createOutputChannel("CRMScript");
+
+        outputchannel.appendLine("Login Successful");
+    }).catch(reason => {
+        console.log("Login failed....");
+
+        if(!outputchannel)
+            outputchannel = vscode.window.createOutputChannel("CRMScript");
+
+        outputchannel.appendLine("Login Failed");
+
+    });
 }
 
 export function executeCurrentScript(){
