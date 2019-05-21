@@ -19,41 +19,42 @@
  *  - validates id_token.
  */
 
-import { AuthorizationRequest } from "@openid/appauth/built/authorization_request";
+import { AuthorizationRequest } from '@openid/appauth/built/authorization_request';
 import {
   AuthorizationNotifier,
   AuthorizationRequestHandler,
   AuthorizationRequestResponse,
   BUILT_IN_PARAMETERS
-} from "@openid/appauth/built/authorization_request_handler";
-import { AuthorizationResponse } from "@openid/appauth/built/authorization_response";
-import { AuthorizationServiceConfiguration } from "@openid/appauth/built/authorization_service_configuration";
-import { NodeCrypto } from "@openid/appauth/built/node_support/";
-import { NodeBasedHandler } from "@openid/appauth/built/node_support/node_request_handler";
-import { NodeRequestor } from "@openid/appauth/built/node_support/node_requestor";
+} from '@openid/appauth/built/authorization_request_handler';
+import { AuthorizationResponse } from '@openid/appauth/built/authorization_response';
+import { AuthorizationServiceConfiguration } from '@openid/appauth/built/authorization_service_configuration';
+import { NodeCrypto } from '@openid/appauth/built/node_support/';
+import { NodeBasedHandler } from '@openid/appauth/built/node_support/node_request_handler';
+import { NodeRequestor } from '@openid/appauth/built/node_support/node_requestor';
 import {
   GRANT_TYPE_AUTHORIZATION_CODE,
   GRANT_TYPE_REFRESH_TOKEN,
   TokenRequest
-} from "@openid/appauth/built/token_request";
+} from '@openid/appauth/built/token_request';
 import {
   BaseTokenRequestHandler,
   TokenRequestHandler
-} from "@openid/appauth/built/token_request_handler";
+} from '@openid/appauth/built/token_request_handler';
 import {
   TokenError,
   TokenResponse
-} from "@openid/appauth/built/token_response";
-import EventEmitter = require("events");
+} from '@openid/appauth/built/token_response';
+import EventEmitter = require('events');
 
-import { log } from "./logger";
-import { StringMap } from "@openid/appauth/built/types";
+import { log } from './logger';
+import { StringMap } from '@openid/appauth/built/types';
 
-import * as jwt from "jsonwebtoken";
-import * as jwksRsa from "jwks-rsa";
+import * as jwt from 'jsonwebtoken';
+import * as jwksRsa from 'jwks-rsa';
+import { ClientMeta } from './api';
 
 export class AuthStateEmitter extends EventEmitter {
-  static ON_TOKEN_RESPONSE = "on_token_response";
+  static ON_TOKEN_RESPONSE = 'on_token_response';
 }
 
 export class AuthTenantInfo {
@@ -67,16 +68,18 @@ export class AuthTenantInfo {
 const requestor = new NodeRequestor();
 
 /* an example open id connect provider */
-const openIdConnectUrl = "https://sod.superoffice.com/login";
+const openIdConnectUrl = 'https://sod.superoffice.com/login';
 
-/* example client configuration */
-const clientId = "dd354918d75b1b53101065c16ee51687";
-const clientSecret = "37933b6e4c7e9d0aee2b4984e1eb974f";
-const sod_jwks_uri = "https://sod.superoffice.com/login/.well-known/jwks";
-const sod_signing_key = "Frf7jD-asGiFqADGTmTJfEq16Yw";
-const redirectUri = "http://127.0.0.1:8000";
-const port : number = 8000;
-const scope = "openid";
+/* client configuration */
+const sod_jwks_uri = 'https://sod.superoffice.com/login/.well-known/jwks';
+const sod_signing_key = 'Frf7jD-asGiFqADGTmTJfEq16Yw';
+const redirectUri = 'http://127.0.0.1:4300/callback';
+const port: number = 4300;
+const scope = 'openid';
+
+let clientId = '';
+let clientSecret = '';
+let clientMetadata: ClientMeta = undefined;
 
 export class AuthFlow {
   private notifier: AuthorizationNotifier;
@@ -100,49 +103,52 @@ export class AuthFlow {
     // set a listener to listen for authorization responses
     // make refresh and access token requests.
     this.notifier.setAuthorizationListener((request, response, error) => {
-      log("Authorization request complete ", request, response, error);
+      log('Authorization request complete ', request, response, error);
       if (response) {
         let codeVerifier: string | undefined;
         if (request.internal && request.internal.code_verifier) {
           codeVerifier = request.internal.code_verifier;
         }
 
-        log("Calling makeRefreshTokenRequest");
+        log('Calling makeRefreshTokenRequest');
 
         this.makeRefreshTokenRequest(response.code, codeVerifier)
           .then(result => this.performWithFreshTokens())
           .then((authTenantInfo: AuthTenantInfo) => {
-            this.authStateEmitter.emit(AuthStateEmitter.ON_TOKEN_RESPONSE, authTenantInfo);
-            log("All Done.");
+            this.authStateEmitter.emit(
+              AuthStateEmitter.ON_TOKEN_RESPONSE,
+              authTenantInfo
+            );
+            log('All Done.');
           });
       }
     });
   }
 
   fetchServiceConfiguration(): Promise<void> {
-    log("In fetchServiceConfiguration");
+    log('In fetchServiceConfiguration');
 
     return AuthorizationServiceConfiguration.fetchFromIssuer(
       openIdConnectUrl,
       requestor
     ).then(response => {
-      log("Fetched service configuration", response);
+      log('Fetched service configuration', response);
       this.configuration = response;
     });
   }
 
-  makeAuthorizationRequest(username?: string) {
-    log("In makeAuthorizationRequest");
+  makeAuthorizationRequest(clientInfo: ClientMeta) {
+    log('In makeAuthorizationRequest');
 
     if (!this.configuration) {
-      log("Unknown service configuration");
+      log('Unknown service configuration');
       return;
     }
 
-    const extras: StringMap = { prompt: "consent", access_type: "offline" };
-    if (username) {
-      extras["login_hint"] = username;
-    }
+    clientId = clientInfo.id;
+    clientSecret = clientInfo.secret;
+
+    const extras: StringMap = { prompt: 'consent', access_type: 'offline' };
 
     // create a request
     const request = new AuthorizationRequest(
@@ -157,7 +163,7 @@ export class AuthFlow {
       new NodeCrypto()
     );
 
-    log("Making authorization request ", this.configuration, request);
+    log('Making authorization request ', this.configuration, request);
 
     this.authorizationHandler.performAuthorizationRequest(
       this.configuration,
@@ -169,17 +175,17 @@ export class AuthFlow {
     code: string,
     codeVerifier: string | undefined
   ): Promise<void> {
-    log("In makeRefreshTokenRequest");
+    log('In makeRefreshTokenRequest');
 
     if (!this.configuration) {
-      log("Unknown service configuration");
+      log('Unknown service configuration');
       return Promise.resolve();
     }
 
     const extras: StringMap = { client_secret: clientSecret };
 
     if (codeVerifier) {
-      log("code verified!");
+      log('code verified!');
       extras.code_verifier = codeVerifier;
     }
 
@@ -196,14 +202,14 @@ export class AuthFlow {
     return this.tokenHandler
       .performTokenRequest(this.configuration, request)
       .then(response => {
-        log("Validating id_token...");
+        log('Validating id_token...');
         this.refreshToken = response.refreshToken;
         this.accessTokenResponse = response;
         let claims = {};
         if (response.idToken) {
           claims = this.validateJwtToken(response.idToken);
         }
-        log("Claims: ", claims);
+        log('Claims: ', claims);
 
         return response;
       })
@@ -220,16 +226,16 @@ export class AuthFlow {
   }
 
   performWithFreshTokens(): Promise<AuthTenantInfo> {
-    log("In performWithFreshTokens");
+    log('In performWithFreshTokens');
 
     if (!this.configuration) {
-      log("Unknown service configuration");
-      return Promise.reject("Unknown service configuration");
+      log('Unknown service configuration');
+      return Promise.reject('Unknown service configuration');
     }
     let authTenantInfo = new AuthTenantInfo();
     if (!this.refreshToken) {
-      log("Missing refreshToken.");
-      authTenantInfo.errorMessage = "Missing refreshToken.";
+      log('Missing refreshToken.');
+      authTenantInfo.errorMessage = 'Missing refreshToken.';
       return Promise.resolve(authTenantInfo);
     }
     // only verifies expiration time
@@ -252,7 +258,7 @@ export class AuthFlow {
       extras: extras
     });
 
-    log("Calling performTokenRequest");
+    log('Calling performTokenRequest');
 
     return this.tokenHandler
       .performTokenRequest(this.configuration, request)
@@ -271,12 +277,12 @@ export class AuthFlow {
     authTenantInfo.idToken = accessTokenResponse.idToken;
     this.validateJwtToken(accessTokenResponse.idToken)
       .then(result => {
-        log("Valid Token!");
+        log('Valid Token!');
         authTenantInfo.claims = result;
         return true;
       })
       .catch(err => {
-        log("Error validating token: ", err);
+        log('Error validating token: ', err);
         return false;
       });
 
@@ -312,7 +318,7 @@ export class AuthFlow {
 
   validateToken(token: string, publicKey: string) {
     return new Promise(function(resolve, reject) {
-      var options = { ignoreExpiration: true, algorithm: ["RS256"] };
+      var options = { ignoreExpiration: true, algorithm: ['RS256'] };
 
       jwt.verify(token, publicKey, options, function(err, decoded) {
         if (err) {
