@@ -102,7 +102,7 @@
     "dependencies": {
         "@openid/appauth": "^1.1.1",
         "events": "3.0.0",
-        "jquery": "^3.4.1",
+        "jquery": "^3.5.0",
         "jsonwebtoken": "^8.5.1",
         "jwks-rsa": "^1.4.0",
         "mac-open": "^0.1.3",
