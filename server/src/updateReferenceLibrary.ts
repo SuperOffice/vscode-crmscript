@@ -8,7 +8,9 @@ import { CategoryData, ChildData, MyCompletionItemData, TocData, TocItem } from 
 const GITHUB_HOST = 'raw.githack.com';
 const GITHUB_PATH_PREFIX = '/SuperOfficeDocs/superoffice-docs/main/docs/en/automation/crmscript/reference/';
 const REFERENCE_FOLDER_PATH = './reference';
-const debug = false;
+
+const debug = true;
+
 let dirPath = '';
 // Cache defined variables, used for getting correct intellisense for classes
 export const completionItemRegistry: CompletionItem[] = [];

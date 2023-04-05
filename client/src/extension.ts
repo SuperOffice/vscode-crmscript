@@ -7,7 +7,17 @@ import { ejScriptIntellisense } from './ejscriptIntellisense';
 import {getCurrentWord, createSnippetItem, getAPIinfo, getCurrentWordAtPosition, isDot, getVarType, getFunctionInfo} from './util';
 import {login} from './api';
 
+import {
+	LanguageClient,
+	LanguageClientOptions,
+	ServerOptions,
+	TransportKind
+} from 'vscode-languageclient/node';
+
+let client: LanguageClient;
+
 import * as cirrusCommands from './cirrusCommands'
+import path = require('path');
 
 const CRMSCRIPT_MODE: vscode.DocumentFilter = { language: 'crmscript', scheme: 'file' };
 
@@ -67,19 +77,70 @@ export function activate(context: vscode.ExtensionContext) {
 
     vscode.workspace.onDidSaveTextDocument(cirrusCommands.onScriptFileSaved);
 
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
+    /*context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
             CRMSCRIPT_MODE, new CRMScriptCompletionItemProvider(), '.', '\"')
     );
     context.subscriptions.push(vscode.languages.registerHoverProvider(
                     CRMSCRIPT_MODE, new CRMScriptHoverProvider())
-    );
+    );*/
     cirrusCommands.init()
+
+    /*Adding languageServer*/
+    // The server is implemented in node
+	const serverModule = context.asAbsolutePath(
+		path.join('server', 'out', 'server.js')
+	);
+	// The debug options for the server
+	// --inspect=6009: runs the server in Node's Inspector mode so VS Code can attach to the server for debugging
+	const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
+
+	// If the extension is launched in debug mode then the debug server options are used
+	// Otherwise the run options are used
+	const serverOptions: ServerOptions = {
+		run: { module: serverModule, transport: TransportKind.ipc },
+		debug: {
+			module: serverModule,
+			transport: TransportKind.ipc,
+			options: debugOptions
+		}
+	};
+
+	// Options to control the language client
+	const clientOptions: LanguageClientOptions = {
+		// Register the server for plain text documents
+		documentSelector: [{ scheme: 'file', language: 'crmscript' }],
+		synchronize: {
+			// Notify the server about file changes to '.crmscript files contained in the workspace
+			fileEvents: vscode.workspace.createFileSystemWatcher('**/.crmscript')
+		},
+		markdown: {
+			isTrusted: true
+		}
+	};
+
+	// Create the language client and start the client.
+	client = new LanguageClient(
+		'crmscript',
+		'CRMScript Language Server',
+		serverOptions,
+		clientOptions
+	);
+
+	// Start the client. This will also launch the server
+	client.start();
+}
+
+export function deactivate(): Thenable<void> | undefined {
+	if (!client) {
+		return undefined;
+	}
+	return client.stop();
 }
 
 /**
  * Auto Completion. 
  * @todo: Only works on variables, not recursively on function calls.
- */
+ *//*
 class CRMScriptCompletionItemProvider implements vscode.CompletionItemProvider {
     public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> {
         return new Promise((resolve, reject) => {
@@ -108,11 +169,11 @@ class CRMScriptCompletionItemProvider implements vscode.CompletionItemProvider {
             }
         });
     }
-}
+}*/
 
 /**
  * @todo: Match the function with parameters...
- */
+ *//*
 class CRMScriptHoverProvider implements vscode.HoverProvider {
     public provideHover (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {		
         console.log('CRMScriptHoverProvider')
@@ -135,7 +196,7 @@ class CRMScriptHoverProvider implements vscode.HoverProvider {
         return undefined;
 	}
 }
-
+*/
 class WordCounter {
 
     private _statusBarItem: StatusBarItem;
@@ -215,8 +276,4 @@ class WordCounterController {
     private _onEvent() {
         this._wordCounter.updateWordCount();
     }
-}
-
-// this method is called when your extension is deactivated
-export function deactivate() {
 }
