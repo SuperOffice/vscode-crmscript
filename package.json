@@ -88,20 +88,20 @@
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
-        "compile": "npm run compile-client && tsc -p ./",
+        "compile": "npm run compile-client && npm run compile-server && tsc -p ./",
         "compile-client": "npx tsc -p ./client",
+        "compile-server": "npx tsc -p ./server",
         "watch": "tsc -watch -p ./",
-        "lint": "eslint ./client/src --ext .ts,.tsx",
-        "postinstall": "cd client && npm install && cd ..",
+        "lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
+        "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
         "test": "sh ./scripts/e2e.sh"
-      }
-      ,
-      "dependencies": {
-        "typescript-rest": "1.7.0"
       },
-      "devDependencies": {
+    "dependencies": {
+        "typescript-rest": "1.7.0"
+    },
+    "devDependencies": {
         "@types/express": "^4.17.17",
         "@types/node": "^16.11.7",
         "typescript": "^5.0.3"
-      }
+    }
 }
