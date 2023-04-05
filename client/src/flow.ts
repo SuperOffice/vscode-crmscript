@@ -309,7 +309,7 @@ export class AuthFlow {
         if (err) {
           reject(err);
         } else {
-          var signingKey = key.publicKey || key.rsaPublicKey;
+          var signingKey = key.getPublicKey();
           resolve(signingKey);
         }
       });

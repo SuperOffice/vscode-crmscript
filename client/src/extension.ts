@@ -104,7 +104,7 @@ class CRMScriptCompletionItemProvider implements vscode.CompletionItemProvider {
                 }
 
             } else {
-                resolve();
+                resolve(items);
             }
         });
     }
