@@ -160,16 +160,16 @@ connection.onExecuteCommand(async (params) => {
 
 function decodeHtmlEntities(text: string): string {
 	const entities: Record<string, string> = {
-	  '&quot;': '"',
-	  '&amp;': '&',
-	  '&lt;': '<',
-	  '&gt;': '>',
-	  '&#39;': "'",
-	  '&apos;': "'"
+		'&quot;': '"',
+		'&amp;': '&',
+		'&lt;': '<',
+		'&gt;': '>',
+		'&#39;': "'",
+		'&apos;': "'"
 	};
-  
+
 	return text.replace(/&quot;|&amp;|&lt;|&gt;|&#39;|&apos;/g, (entity) => entities[entity]);
-  }
+}
 
 connection.onDidChangeConfiguration(change => {
 	if (hasConfigurationCapability) {
@@ -218,7 +218,7 @@ documents.onDidChangeContent(change => {
 });
 
 documents.onDidChangeContent(change => {
-    validateTextDocument(change.document);
+	validateTextDocument(change.document);
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
