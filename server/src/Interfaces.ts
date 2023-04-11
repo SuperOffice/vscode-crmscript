@@ -7,11 +7,9 @@ export interface TocItem {
 	href: string;
 	items?: TocItem[];
 }
-
 export interface TocData {
 	items: TocItem[];
 }
-
 export interface CategoryData {
 	items: {
 		uid: string;
@@ -33,7 +31,6 @@ export interface CategoryData {
 		}[];
 	}[];
 }
-
 export interface ChildData {
 	items: {
 		uid: string;
@@ -54,7 +51,6 @@ export interface ChildData {
 		parent?: string;
 	}[];
 }
-
 export interface MyCompletionItemData {
 	filename: string;
 	exampleCode: string;

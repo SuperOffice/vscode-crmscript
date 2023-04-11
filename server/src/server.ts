@@ -5,8 +5,6 @@
 import {
 	createConnection,
 	TextDocuments,
-	Diagnostic,
-	DiagnosticSeverity,
 	ProposedFeatures,
 	InitializeParams,
 	DidChangeConfigurationNotification,
@@ -19,26 +17,23 @@ import {
 	MarkupKind,
 	MarkedString,
 	Hover,
-	ExecuteCommandParams,
-	TextDocumentEdit,
-	Position,
 	TextEdit,
 	WorkspaceEdit
 } from 'vscode-languageserver/node';
 
 import {
-	TextDocument
+	TextDocument,
 } from 'vscode-languageserver-textdocument';
 
-import { tocYmlFileName } from './Legacy/updateReferenceLibraryOld';
-import { TocRoot, YmlRoot } from './Legacy/interface';
+import { YmlRoot } from './Legacy/interface';
 
 import { UpdateReferenceLibrary, completionItemRegistry } from './updateReferenceLibrary';
 
 import path = require('path');
 import { readFileSync } from 'fs';
 import { load } from 'js-yaml';
-import { MyCompletionItemData, VariableInfo } from './Interfaces';
+import { VariableInfo } from './Interfaces';
+import { updateVariablesRegistry, variablesRegistry } from './updateVariablesRegistry';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -46,9 +41,6 @@ const connection = createConnection(ProposedFeatures.all);
 
 // Create a simple text document manager.
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
-
-// Cache defined variables, used for getting correct intellisense for classes
-const variablesRegistry: Map<string, VariableInfo> = new Map();
 
 //Add a Map to store the latest document URIs by the client
 let _currentCursorPosition: TextDocumentPositionParams | null = null;
@@ -213,24 +205,16 @@ documents.onDidChangeContent(change => {
 	validateTextDocument(change.document);
 });
 
+documents.onDidChangeContent(change => {
+    validateTextDocument(change.document);
+});
+
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
-	// In this simple example we get the settings for every validate run.
-	const settings = await getDocumentSettings(textDocument.uri);
-	// The validator creates diagnostics for all uppercase words length 2 and more
 	const text = textDocument.getText();
-	// Clear the symbol table for the current document and parse the new content
-	variablesRegistry.clear();
-	//TODO: Parse whole textDocument and find all the variables defined. 
-	const _textDocumentLines = text.split(";\r\n"); //Split textDocument into lines
-	_textDocumentLines.forEach(line => {
-		if (line.includes(" ")) {
-			const words = line.split(" ");
-			//TODO: Create this variableInfo dynamically based on the name of the variable, that should be supplied by the onCompletion-provider (?)
-			const variableLookup = completionItemRegistry.find(item => item.label === words[0]);
-			const variableInfo: VariableInfo = { name: words[0], href: variableLookup?.data.filename };
-			variablesRegistry.set(words[1], variableInfo);
-		}
-	});
+	updateVariablesRegistry(text);
+
+	// In this simple example we get the settings for every validate run.
+	/*const settings = await getDocumentSettings(textDocument.uri);
 
 	const pattern = /\b[A-Z]{2,}\b/g;
 	let m: RegExpExecArray | null;
@@ -270,7 +254,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	}
 
 	// Send the computed diagnostics to VSCode.
-	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
+	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });*/
 }
 
 connection.onDidChangeWatchedFiles(_change => {

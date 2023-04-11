@@ -9,7 +9,7 @@ const GITHUB_HOST = 'raw.githack.com';
 const GITHUB_PATH_PREFIX = '/SuperOfficeDocs/superoffice-docs/main/docs/en/automation/crmscript/reference/';
 const REFERENCE_FOLDER_PATH = './reference';
 
-const debug = true;
+const updateReferenceLibraryFiles = false;
 
 let dirPath = '';
 // Cache defined variables, used for getting correct intellisense for classes
@@ -23,7 +23,7 @@ async function validateDirPath() {
 }
 
 async function fetchYMLfile(filename: string): Promise<string> {
-  if (debug) {
+  if (!updateReferenceLibraryFiles) {
     const filePath = path.join(dirPath, filename);
     const fileContents = readFileSync(filePath, 'utf8');
     return fileContents;
