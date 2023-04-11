@@ -25,14 +25,12 @@ import {
 	TextDocument,
 } from 'vscode-languageserver-textdocument';
 
-import { YmlRoot } from './Legacy/interface';
-
 import { UpdateReferenceLibrary, completionItemRegistry } from './updateReferenceLibrary';
 
 import path = require('path');
 import { readFileSync } from 'fs';
 import { load } from 'js-yaml';
-import { MyCompletionItemData, VariableInfo } from './Interfaces';
+import { MyCompletionItemData, VariableInfo, YmlRoot } from './Interfaces';
 import { updateVariablesRegistry, variablesRegistry } from './updateVariablesRegistry';
 
 // Create a connection for the server, using Node's IPC as a transport.
