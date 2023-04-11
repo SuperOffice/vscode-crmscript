@@ -32,7 +32,7 @@ import { UpdateReferenceLibrary, completionItemRegistry } from './updateReferenc
 import path = require('path');
 import { readFileSync } from 'fs';
 import { load } from 'js-yaml';
-import { VariableInfo } from './Interfaces';
+import { MyCompletionItemData, VariableInfo } from './Interfaces';
 import { updateVariablesRegistry, variablesRegistry } from './updateVariablesRegistry';
 
 // Create a connection for the server, using Node's IPC as a transport.
@@ -131,20 +131,19 @@ connection.onHover((params: TextDocumentPositionParams): Hover | undefined => {
 });
 
 connection.onExecuteCommand(async (params) => {
-	if (params.command !== 'insertExampleCode' || _currentCursorPosition === null) {
+	if (params.command !== 'insertExampleCode' || _currentCursorPosition === null || !params.arguments) {
 		return;
 	}
 
 	const { uri } = _currentCursorPosition.textDocument;
 	const { line, character } = _currentCursorPosition.position;
-	const newText = 'new text to insert';
-
+	const myCompletionItemData = params.arguments[0] as MyCompletionItemData;
 	const textEdit: TextEdit = {
 		range: {
 			start: { line, character },
 			end: { line, character }
 		},
-		newText: newText
+		newText: decodeHtmlEntities(myCompletionItemData.exampleCode)
 	};
 
 	const edit: WorkspaceEdit = {
@@ -158,6 +157,19 @@ connection.onExecuteCommand(async (params) => {
 		// handle the case where the edit was not applied
 	}
 });
+
+function decodeHtmlEntities(text: string): string {
+	const entities: Record<string, string> = {
+	  '&quot;': '"',
+	  '&amp;': '&',
+	  '&lt;': '<',
+	  '&gt;': '>',
+	  '&#39;': "'",
+	  '&apos;': "'"
+	};
+  
+	return text.replace(/&quot;|&amp;|&lt;|&gt;|&#39;|&apos;/g, (entity) => entities[entity]);
+  }
 
 connection.onDidChangeConfiguration(change => {
 	if (hasConfigurationCapability) {
