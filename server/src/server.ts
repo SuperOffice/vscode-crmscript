@@ -32,6 +32,7 @@ import { readFileSync } from 'fs';
 import { load } from 'js-yaml';
 import { MyCompletionItemData, VariableInfo, YmlFile } from './Interfaces';
 import { updateVariablesRegistry, variablesRegistry } from './updateVariablesRegistry';
+import { addClassMethods, addvariablesRegistryToCompletionItems } from './completionItems';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -301,49 +302,3 @@ documents.listen(connection);
 
 // Listen on the connection
 connection.listen();
-
-function addvariablesRegistryToCompletionItems(completionItems: CompletionItem[], variablesRegistry: Map<string, VariableInfo>) {
-	for (const [key, value] of variablesRegistry.entries()) {
-		const obj = {
-			label: key,
-			kind: CompletionItemKind.Variable,
-		};
-		completionItems.push(obj);
-	}
-	return completionItems;
-}
-
-function addClassMethods(completionItems: CompletionItem[], ymlFileName: string) {
-	const ymlFilePath = path.join(__dirname, 'reference', ymlFileName),
-		contents = readFileSync(ymlFilePath, 'utf8'),
-		data = load(contents) as YmlFile;
-
-	for (let i = 1; i < data.items.length; ++i) {
-
-		const markdown: MarkupContent = {
-			kind: MarkupKind.Markdown,
-			value: [
-				'# ' + data.items[i].id,
-				'[Docs] ' + "https://docs.superoffice.com/automation/crmscript/reference/" + data.items[0].uid + ".html", //TODO: Figure out a more dynamic way of setting this..
-				'',
-				'' + data.items[i].summary,
-				'',
-				'```javascript',
-				'',
-				'' + data.items[i].id,
-				'',
-				'```'
-			].join('\n')
-		};
-
-		const obj = {
-			label: data.items[i].id as string,
-			kind: CompletionItemKind.Method,
-			insertText: data.items[i].id, //Get string between <code> and </code>;,
-			//detail: data.items[i].summary,
-			documentation: markdown,
-		};
-		completionItems.push(obj);
-	}
-	return completionItems;
-}
