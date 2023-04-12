@@ -43,7 +43,7 @@ export function onCompletion(
             );
             const variableInfo = variablesRegistry.get(_variableName);
             //search in completionItemRegistry for an item that has label equals to _variableName
-            if (variableInfo) {
+            if (variableInfo && variableInfo.href) {
                 addClassMethods(completionItems, variableInfo.href);
             }
             return completionItems;
