@@ -25,12 +25,12 @@ import {
 	TextDocument,
 } from 'vscode-languageserver-textdocument';
 
-import { UpdateReferenceLibrary, completionItemRegistry } from './updateReferenceLibrary';
+import { UpdateReferenceLibrary, completionItemRegistry, validateDirPath } from './updateReferenceLibrary';
 
 import path = require('path');
 import { readFileSync } from 'fs';
 import { load } from 'js-yaml';
-import { MyCompletionItemData, VariableInfo, YmlRoot } from './Interfaces';
+import { MyCompletionItemData, VariableInfo, YmlFile } from './Interfaces';
 import { updateVariablesRegistry, variablesRegistry } from './updateVariablesRegistry';
 
 // Create a connection for the server, using Node's IPC as a transport.
@@ -61,13 +61,13 @@ let hasDiagnosticRelatedInformationCapability = false;
 
 connection.onInitialize((params: InitializeParams) => {
 	//Get reference-library from github
-	UpdateReferenceLibrary()
+	/*UpdateReferenceLibrary()
 		.then((result) => {
 			//console.log(result);
 		})
 		.catch((error) => {
 			console.error(error);
-		});
+		});*/
 
 	const capabilities = params.capabilities;
 
@@ -94,7 +94,7 @@ connection.onInitialize((params: InitializeParams) => {
 			},
 			hoverProvider: true,
 			executeCommandProvider: {
-				commands: ["insertExampleCode"]
+				commands: ['insertExampleCode', 'server.referenceLibrary.validate', 'server.referenceLibrary.download']
 			}
 		}
 	};
@@ -129,6 +129,17 @@ connection.onHover((params: TextDocumentPositionParams): Hover | undefined => {
 });
 
 connection.onExecuteCommand(async (params) => {
+	if (params.command === 'server.referenceLibrary.validate') {
+		return validateDirPath();
+	}
+
+	if (params.command === 'server.referenceLibrary.download') {
+		const update = params.arguments && params.arguments[0]; // Extract the update argument from params.arguments
+		await UpdateReferenceLibrary(update);
+    	return true;
+	}
+
+	//Needs to be refactored to onCodeAction
 	if (params.command !== 'insertExampleCode' || _currentCursorPosition === null || !params.arguments) {
 		return;
 	}
@@ -318,7 +329,7 @@ function addvariablesRegistryToCompletionItems(completionItems: CompletionItem[]
 function addClassMethods(completionItems: CompletionItem[], ymlFileName: string) {
 	const ymlFilePath = path.join(__dirname, 'reference', ymlFileName),
 		contents = readFileSync(ymlFilePath, 'utf8'),
-		data = load(contents) as YmlRoot;
+		data = load(contents) as YmlFile;
 
 	for (let i = 1; i < data.items.length; ++i) {
 
@@ -339,7 +350,7 @@ function addClassMethods(completionItems: CompletionItem[], ymlFileName: string)
 		};
 
 		const obj = {
-			label: data.items[i].id,
+			label: data.items[i].id as string,
 			kind: CompletionItemKind.Method,
 			insertText: data.items[i].id, //Get string between <code> and </code>;,
 			//detail: data.items[i].summary,

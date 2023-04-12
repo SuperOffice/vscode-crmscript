@@ -2,6 +2,11 @@ export interface VariableInfo {
 	name: string;
 	href: string;
 }
+export interface MyCompletionItemData {
+	filename: string;
+	exampleCode: string;
+}
+/*
 export interface TocItem {
 	name: string;
 	href: string;
@@ -51,16 +56,10 @@ export interface ChildData {
 		parent?: string;
 	}[];
 }
-export interface MyCompletionItemData {
-	filename: string;
-	exampleCode: string;
-  }
-
-  export interface YmlRoot {
+export interface YmlRoot {
 	items: YmlItem[];
 	references: YmlReference[];
 }
-
 export interface YmlItem {
 	uid: string;
 	commentId: string;
@@ -75,6 +74,45 @@ export interface YmlItem {
 	summary: string;
 	example?: string[] | null;
 }
+export interface YmlReference {
+	uid: string;
+	commentId: string;
+	isExternal: boolean;
+	name: string;
+	nameWithType: string;
+	fullName: string;
+}
+export interface TocRoot {
+	items: TocRootItem[];
+}
+export interface TocRootItem {
+	name: string;
+	href: string;
+	items?: TocRootItem[];
+}*/
+
+export interface YmlItem {
+	uid?: string;
+	commentId?: string;
+	id?: string;
+	langs?: string[];
+	children?: string[];
+	name: string;
+	nameWithType?: string;
+	fullName?: string;
+	type?: string;
+	href?: string;
+	items?: YmlItem[];
+	summary?: string;
+	so?: {
+		intellisense?: string;
+	};
+	parent?: string;
+	syntax?: {
+		content: string;
+	};
+	example?: string;
+}
 
 export interface YmlReference {
 	uid: string;
@@ -85,13 +123,7 @@ export interface YmlReference {
 	fullName: string;
 }
 
-export interface TocRoot {
-	items: TocRootItem[];
+export interface YmlFile {
+	items: YmlItem[];
+	references?: YmlReference[];
 }
-
-export interface TocRootItem {
-	name: string;
-	href: string;
-	items?: TocRootItem[];
-}
-
