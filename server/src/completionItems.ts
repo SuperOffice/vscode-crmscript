@@ -60,7 +60,7 @@ function createMarkdown(items: YmlItem): MarkupContent {
         const obj: CompletionItem = {
             label: ymlFile.items[i].name,
             kind: CompletionItemKind.TypeParameter,
-            insertText: `${ymlFile.items[i].name} ${ymlFile.items[i].name.toLowerCase()};`,
+            insertText: `${ymlFile.items[i].name};`,
             documentation: createMarkdown(ymlFile.items[i]),
             data: {
               filename: `${ymlFile.items[i].uid as string}.yml`,
