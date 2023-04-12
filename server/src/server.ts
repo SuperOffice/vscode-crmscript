@@ -277,7 +277,7 @@ connection.onCompletion((_textDocumentPosition: TextDocumentPositionParams): Com
 	const completionItems: CompletionItem[] = [];
 	const _textDocumentText = documents?.get(_textDocumentPosition.textDocument.uri)?.getText();
 	if (_textDocumentText) {
-		const _textDocumentLines = _textDocumentText.split(";\r\n"); //Split textDocument into lines
+		const _textDocumentLines = _textDocumentText.split(/\r?\n/); //Split textDocument into lines
 		const _textDocumentLine = _textDocumentLines[_textDocumentPosition.position.line]; //Get correct line
 		//Check if its a dot, that means this is possible an already defined variable
 		const _character = _textDocumentLine.substring(_textDocumentPosition.position.character - 1, _textDocumentPosition.position.character);
