@@ -4,7 +4,7 @@ import { load } from 'js-yaml';
 import { CompletionItem } from 'vscode-languageserver/node';
 import { YmlFile, YmlItem } from './Interfaces';
 import axios from 'axios';
-import { addCompletionItem } from './completionItems';
+import { addCompletionClassItem, addCompletionItem } from './providers/completionProvider';
 
 const GITHUB_HOST = 'raw.githack.com';
 const GITHUB_PATH_PREFIX = '/SuperOfficeDocs/superoffice-docs/main/docs/en/automation/crmscript/reference/';
@@ -72,8 +72,13 @@ async function parseChildren(children: string[]): Promise<void> {
 async function parseYMLfile(file: YmlFile) {
   if (file.items[0].type == "Namespace") {
     await parseChildren(file.items[0].children as string[]);
-  } else {
-    console.error(`This is not a namespace`);
+  } 
+  else if (file.items[0].type == "Class") {
+    addCompletionClassItem(file.items as YmlItem[]);
+    //console.error(`This is a type Class: ${file.items[0].uid}`);
+  }
+  else {
+    console.error(`Unknown type: ${file.items[0].type}`);
   }
 }
 
