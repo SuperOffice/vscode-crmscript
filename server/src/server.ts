@@ -60,15 +60,6 @@ let hasWorkspaceFolderCapability = false;
 let hasDiagnosticRelatedInformationCapability = false;
 
 connection.onInitialize((params: InitializeParams) => {
-	//Get reference-library from github
-	/*UpdateReferenceLibrary()
-		.then((result) => {
-			//console.log(result);
-		})
-		.catch((error) => {
-			console.error(error);
-		});*/
-
 	const capabilities = params.capabilities;
 
 	// Does the client support the `workspace/configuration` request?
@@ -128,6 +119,7 @@ connection.onHover((params: TextDocumentPositionParams): Hover | undefined => {
 	};
 });
 
+//TODO: Move the insertExampleCode to be something different then a command
 connection.onExecuteCommand(async (params) => {
 	if (params.command === 'server.referenceLibrary.validate') {
 		return validateDirPath();
@@ -135,8 +127,7 @@ connection.onExecuteCommand(async (params) => {
 
 	if (params.command === 'server.referenceLibrary.download') {
 		const update = params.arguments && params.arguments[0]; // Extract the update argument from params.arguments
-		await UpdateReferenceLibrary(update);
-    	return true;
+    	return UpdateReferenceLibrary(update);
 	}
 
 	//Needs to be refactored to onCodeAction
@@ -222,10 +213,6 @@ documents.onDidClose(e => {
 
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
-documents.onDidChangeContent(change => {
-	validateTextDocument(change.document);
-});
-
 documents.onDidChangeContent(change => {
 	validateTextDocument(change.document);
 });

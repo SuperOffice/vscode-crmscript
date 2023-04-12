@@ -1,9 +1,8 @@
-import { request } from 'http';
-import { createWriteStream, existsSync, mkdirSync, readFileSync, promises as fsPromises } from 'fs';
+import { createWriteStream, existsSync, mkdirSync, promises as fsPromises } from 'fs';
 import path = require('path');
 import { load } from 'js-yaml';
-import { CompletionItem, CompletionItemKind, CompletionItemTag, MarkupContent, MarkupKind } from 'vscode-languageserver/node';
-import { YmlFile, YmlItem, MyCompletionItemData } from './Interfaces';
+import { CompletionItem } from 'vscode-languageserver/node';
+import { YmlFile, YmlItem } from './Interfaces';
 import axios from 'axios';
 import { addCompletionItem } from './completionItems';
 
@@ -25,7 +24,6 @@ export async function validateDirPath(): Promise<Boolean> {
   }
   return true;
 }
-
 
 async function fetchYMLfile(filename: string): Promise<string | undefined> {
   const filePath = path.join(dirPath, filename);
@@ -55,86 +53,59 @@ async function fetchYMLfile(filename: string): Promise<string | undefined> {
   }
 }
 
-async function getYmlFile(filename: string): Promise<YmlFile | undefined> {
-  const result = await fetchYMLfile(filename);
-  if (result) {
-    const ymlFile = load(result) as YmlFile;
-    return load(result) as YmlFile;
+async function parseChildren(children: string[]): Promise<void> {
+  for (const child of children) {
+    try {
+      const result = await fetchYMLfile(`${child}.yml`);
+      if (result) {
+        const childFile = load(result) as YmlFile;
+        addCompletionItem(childFile.items as YmlItem[]);
+      } else {
+        console.error(`Could not find file ${child}.yml`);
+      }
+    } catch (error) {
+      console.error(`Error on file ${child}.yml: ${error}`);
+    }
   }
 }
 
-async function getCategoryChildrenData(file: YmlFile) {
+async function parseYMLfile(file: YmlFile) {
   if (file.items[0].type == "Namespace") {
-    for (const child of file.items[0].children as string[]) {
-      try {
-        const result = await fetchYMLfile(`${child}.yml`);
-        if (result) {
-          const childFile = load(result) as YmlFile;
-          addCompletionItem(childFile.items as YmlItem[]);
-        } else {
-          console.error(`Could not find file ${child}.yml`);
-        }
-      } catch (error) {
-        console.error(`Error on file ${child}.yml: ${error}`);
-      }
-    }
+    await parseChildren(file.items[0].children as string[]);
   } else {
     console.error(`This is not a namespace`);
+  }
+}
+
+async function processTocItems(items: YmlItem[]): Promise<void> {
+  for (const item of items) {
+    if (item.href) {
+      const result = await fetchYMLfile(item.href);
+      if (result) {
+        const ymlFile = load(result) as YmlFile
+        await parseYMLfile(ymlFile);
+      } else {
+        console.error(`Could not download file: ${item.href}`);
+      }
+    } else {
+      console.error(`Missing href: ${item.href} for file: ${item.uid}.yml. Skipping this file`);
+    }
   }
 }
 
 export async function UpdateReferenceLibrary(update: boolean) {
   updateReferenceLibraryFiles = update;
   await validateDirPath();
-  const tocFile = await getYmlFile('toc.yml');
-  if(tocFile){
-    for (const item of tocFile.items) {
-      if (item.href) {
-        await getYmlFile(item.href)
-          .then(async (categoryData) => {
-            if(categoryData){
-              const categoryChildrenData = getCategoryChildrenData(categoryData);
-            }
-          });
-      }
-      else {
-        console.error(`Missing href: ${item.href} for file: ${item.uid}.yml. Skipping this file`);
-      }
-    }
-  }
-}
-/*LEGACY */
-async function fetchYMLfileOld(filename: string): Promise<string> {
-  if (!updateReferenceLibraryFiles) {
-    const filePath = path.join(dirPath, filename);
-    const fileContents = readFileSync(filePath, 'utf8');
-    return fileContents;
-  }
 
-  return new Promise((resolve, reject) => {
-    const req = request(
-      {
-        host: GITHUB_HOST,
-        path: GITHUB_PATH_PREFIX + filename,
-        method: 'GET',
-      },
-      function (response) {
-        if (response.statusCode !== 200) {
-          reject(`Error downloading file: HTTP ${response.statusCode}`);
-          return;
-        }
-        const filePath = path.join(dirPath, filename);
-        const fileStream = createWriteStream(filePath);
-        response.pipe(fileStream);
-        fileStream.on('finish', () => {
-          const fileContents = readFileSync(filePath, 'utf8');
-          resolve(fileContents);
-        });
-      }
-    );
-    req.on('error', (error) => {
-      reject(`Error downloading file: ${error.message}`);
-    });
-    req.end();
-  });
+  const result = await fetchYMLfile('toc.yml');
+  if (result) {
+    const tocFile = load(result) as YmlFile;
+    if (tocFile) {
+      await processTocItems(tocFile.items);
+    }
+  } else {
+    console.error(`Could not download toc.yml`);
+  }
+  return true;
 }
+
