@@ -8,7 +8,7 @@ export async function validateReferenceLibrary(client: LanguageClient): Promise<
 
   await downloadReferenceLibraryWithProgress(client, update);
 
-  await vscode.window.showInformationMessage('Done loading intellisense!');
+  await vscode.window.showInformationMessage('Done loading extension!');
 }
 
 async function checkReferenceLibraryExistence(client: LanguageClient): Promise<boolean> {
@@ -23,7 +23,7 @@ async function shouldUpdateReferenceLibrary(referenceLibraryExist: boolean): Pro
   }
 
   const result = await vscode.window.showInformationMessage(
-    'Do you want to update the ReferenceLibrary?',
+    'Do you want to update the intellisense?',
     'Yes',
     'No'
   );
@@ -34,7 +34,7 @@ async function shouldUpdateReferenceLibrary(referenceLibraryExist: boolean): Pro
 async function downloadReferenceLibraryWithProgress(client: LanguageClient, update: boolean): Promise<void> {
   await vscode.window.withProgress({
     location: vscode.ProgressLocation.Notification,
-    title: update ? 'ReferenceLibrary missing. Downloading ReferenceLibrary...' : 'Parsing ReferenceLibrary...',
+    title: update ? 'Downloading dependencies...' : 'Generating intellisense...',
     cancellable: false,
   }, async () => {
     await client.sendRequest('workspace/executeCommand', {

@@ -224,7 +224,6 @@ connection.onCompletion((_textDocumentPosition: TextDocumentPositionParams): Com
 	_currentCursorPosition = _textDocumentPosition;
 	return completionHandler(
 		_textDocumentPosition,
-		variablesRegistry,
 	);
 });
 

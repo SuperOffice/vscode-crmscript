@@ -3,7 +3,8 @@ import {
     CompletionItem,
     CompletionItemKind,
     MarkupContent,
-    MarkupKind
+    MarkupKind,
+    integer
 } from "vscode-languageserver/node";
 import { documents } from "../server";
 import { readFileSync } from "fs";
@@ -15,10 +16,11 @@ import {
     YmlItem,
 } from "../Interfaces";
 import { completionItemRegistry } from "../updateReferenceLibrary";
+import { methodsRegistry, variablesRegistry } from "../updateVariablesRegistry";
+import { setFlagsFromString } from "v8";
 
 export function completionHandler(
-    _textDocumentPosition: TextDocumentPositionParams,
-    variablesRegistry: Map<string, VariableInfo>
+    _textDocumentPosition: TextDocumentPositionParams
 ): CompletionItem[] {
     //create new completionItems
     const completionItems: CompletionItem[] = [];
@@ -47,7 +49,7 @@ export function completionHandler(
             return completionItems;
         }
     }
-    addvariablesRegistryToCompletionItems(completionItems, variablesRegistry);
+    addvariablesRegistryToCompletionItems(completionItems);
     completionItems.push(...completionItemRegistry);
     return completionItems;
 }
@@ -79,19 +81,43 @@ export function addClassMethods(
 }
 
 export function addvariablesRegistryToCompletionItems(
-    completionItems: CompletionItem[],
-    variablesRegistry: Map<string, VariableInfo>
+    completionItems: CompletionItem[]
 ) {
     variablesRegistry.forEach((_value, key) => {
         const obj = {
             label: key,
-            kind: CompletionItemKind.Class,
+            kind: CompletionItemKind.Keyword,
         };
         completionItems.push(obj);
     });
+
+    methodsRegistry.forEach((_value, key) => {
+        const obj: CompletionItem = {
+            label: key,
+            kind: CompletionItemKind.Function,
+            insertText: `${key};`,
+            documentation: {
+                kind: MarkupKind.Markdown,
+                value: [
+                    `# ${key}`,
+                    '',
+                    `Summary goes here`,
+                    '',
+                    '```crmscript',
+                    '',
+                    `CodeBlock goes here`,
+                    '',
+                    '```',
+                    '',
+                ].join('\n')
+            },
+            detail: `returns ${_value.returns}`,
+        };
+        completionItems.push(obj);
+    });
+
     return completionItems;
 }
-
 function createMarkdown(items: YmlItem): MarkupContent {
     const example = items.example || '';
     const exampleString = Array.isArray(example) ? example[0] : example;
