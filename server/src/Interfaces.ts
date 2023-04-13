@@ -2,10 +2,6 @@ export interface VariableInfo {
 	name: string;
 	href: string;
 }
-export interface MyCompletionItemData {
-	filename: string;
-	exampleCode: string;
-}
 export interface YmlItem {
 	uid?: string;
 	commentId?: string;

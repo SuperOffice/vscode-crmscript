@@ -18,21 +18,21 @@ import {
 	MarkedString,
 	Hover,
 	TextEdit,
-	WorkspaceEdit
+	WorkspaceEdit,
+	CodeActionKind,
+	CodeActionParams,
+	CodeAction
 } from 'vscode-languageserver/node';
 
 import {
 	TextDocument,
 } from 'vscode-languageserver-textdocument';
 
-import { UpdateReferenceLibrary, completionItemRegistry, validateDirPath } from './updateReferenceLibrary';
-
-import path = require('path');
-import { readFileSync } from 'fs';
-import { load } from 'js-yaml';
-import { MyCompletionItemData, VariableInfo, YmlFile } from './Interfaces';
+import { VariableInfo } from './Interfaces';
 import { updateVariablesRegistry, variablesRegistry } from './updateVariablesRegistry';
-import { onCompletion } from './providers/completionProvider';
+import { completionHandler } from './providers/completionProvider';
+import { executeCommandHandler } from './providers/executeCommandProvider';
+import { codeActionHandler } from './providers/codeActionProvider';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -60,7 +60,7 @@ let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
 let hasDiagnosticRelatedInformationCapability = false;
 
-connection.onInitialize((params: InitializeParams) => {
+connection.onInitialize(async (params: InitializeParams) => {
 	const capabilities = params.capabilities;
 
 	// Does the client support the `workspace/configuration` request?
@@ -77,29 +77,28 @@ connection.onInitialize((params: InitializeParams) => {
 		capabilities.textDocument.publishDiagnostics.relatedInformation
 	);
 
-	const result: InitializeResult = {
+	// Return the server capabilities
+	return {
 		capabilities: {
 			textDocumentSync: TextDocumentSyncKind.Incremental,
-			// Tell the client that this server supports code completion.
 			completionProvider: {
 				//resolveProvider: true
 			},
 			hoverProvider: true,
 			executeCommandProvider: {
 				commands: ['insertExampleCode', 'server.referenceLibrary.validate', 'server.referenceLibrary.download']
+			},
+			workspace: {
+				workspaceFolders: {
+					supported: true
+				}
+			},
+			codeActionProvider: {
+				codeActionKinds: [CodeActionKind.Refactor]
 			}
 		}
 	};
-	if (hasWorkspaceFolderCapability) {
-		result.capabilities.workspace = {
-			workspaceFolders: {
-				supported: true
-			}
-		};
-	}
-	return result;
 });
-
 
 connection.onInitialized(() => {
 	if (hasConfigurationCapability) {
@@ -112,65 +111,6 @@ connection.onInitialized(() => {
 		});
 	}
 });
-
-connection.onHover((params: TextDocumentPositionParams): Hover | undefined => {
-	const doc: MarkedString[] = ["# Titlte", "### description"];
-	return {
-		contents: doc
-	};
-});
-
-//TODO: Move the insertExampleCode to be something different then a command
-connection.onExecuteCommand(async (params) => {
-	if (params.command === 'server.referenceLibrary.validate') {
-		return validateDirPath();
-	}
-
-	if (params.command === 'server.referenceLibrary.download') {
-		const update = params.arguments && params.arguments[0]; // Extract the update argument from params.arguments
-    	return UpdateReferenceLibrary(update);
-	}
-
-	//Needs to be refactored to onCodeAction
-	if (params.command !== 'insertExampleCode' || _currentCursorPosition === null || !params.arguments) {
-		return;
-	}
-
-	const { uri } = _currentCursorPosition.textDocument;
-	const { line, character } = _currentCursorPosition.position;
-	const myCompletionItemData = params.arguments[0] as MyCompletionItemData;
-	const textEdit: TextEdit = {
-		range: {
-			start: { line, character },
-			end: { line, character }
-		},
-		newText: decodeHtmlEntities(myCompletionItemData.exampleCode)
-	};
-
-	const edit: WorkspaceEdit = {
-		changes: {
-			[uri]: [textEdit]
-		}
-	};
-
-	const response = await connection.workspace.applyEdit(edit);
-	if (!response.applied) {
-		// handle the case where the edit was not applied
-	}
-});
-
-function decodeHtmlEntities(text: string): string {
-	const entities: Record<string, string> = {
-		'&quot;': '"',
-		'&amp;': '&',
-		'&lt;': '<',
-		'&gt;': '>',
-		'&#39;': "'",
-		'&apos;': "'"
-	};
-
-	return text.replace(/&quot;|&amp;|&lt;|&gt;|&#39;|&apos;/g, (entity) => entities[entity]);
-}
 
 connection.onDidChangeConfiguration(change => {
 	if (hasConfigurationCapability) {
@@ -185,7 +125,6 @@ connection.onDidChangeConfiguration(change => {
 	// Revalidate all open text documents
 	documents.all().forEach(validateTextDocument);
 });
-
 
 // The example settings
 interface ExampleSettings {
@@ -212,8 +151,19 @@ documents.onDidClose(e => {
 	documentSettings.delete(e.document.uri);
 });
 
-// The content of a text document has changed. This event is emitted
-// when the text document first opened or when its content has changed.
+connection.onHover((params: TextDocumentPositionParams): Hover | undefined => {
+	const doc: MarkedString[] = ["# Titlte", "### description"];
+	return {
+		contents: doc
+	};
+});
+
+connection.onDidChangeWatchedFiles(_change => {
+	// Monitored files have change in VSCode
+	connection.console.log('We received an file change event');
+});
+
+
 documents.onDidChangeContent(change => {
 	validateTextDocument(change.document);
 });
@@ -266,43 +216,21 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });*/
 }
 
-connection.onDidChangeWatchedFiles(_change => {
-	// Monitored files have change in VSCode
-	connection.console.log('We received an file change event');
+connection.onExecuteCommand(async (params) => {
+	return await executeCommandHandler(connection, params, _currentCursorPosition);
 });
 
 connection.onCompletion((_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
 	_currentCursorPosition = _textDocumentPosition;
-	return onCompletion(
-	  _textDocumentPosition,
-	  variablesRegistry,
+	return completionHandler(
+		_textDocumentPosition,
+		variablesRegistry,
 	);
-  });
+});
 
-/*connection.onCompletion((_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-	//create new completionItems
-	_currentCursorPosition = _textDocumentPosition;
-	const completionItems: CompletionItem[] = [];
-	const _textDocumentText = documents?.get(_textDocumentPosition.textDocument.uri)?.getText();
-	if (_textDocumentText) {
-		const _textDocumentLines = _textDocumentText.split(/\r?\n/); //Split textDocument into lines
-		const _textDocumentLine = _textDocumentLines[_textDocumentPosition.position.line]; //Get correct line
-		//Check if its a dot, that means this is possible an already defined variable
-		const _character = _textDocumentLine.substring(_textDocumentPosition.position.character - 1, _textDocumentPosition.position.character);
-		if (_character == ".") {
-			const _variableName = _textDocumentLine.substring(0, _textDocumentPosition.position.character - 1);
-			const variableInfo = variablesRegistry.get(_variableName);
-			//search in completionItemRegistry for an item that has label equals to _variableName
-			if (variableInfo) {
-				addClassMethods(completionItems, variableInfo.href);
-			}
-			return completionItems;
-		}
-	}
-	addvariablesRegistryToCompletionItems(completionItems, variablesRegistry);
-	completionItems.push(...completionItemRegistry);
-	return completionItems;
-});*/
+connection.onCodeAction((params: CodeActionParams) => {
+	return [codeActionHandler(params)];
+});
 
 // Make the text document manager listen on the connection
 // for open, change and close text document events

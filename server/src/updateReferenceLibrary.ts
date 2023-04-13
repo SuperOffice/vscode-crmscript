@@ -8,25 +8,23 @@ import { addCompletionClassItem, addCompletionItem } from './providers/completio
 
 const GITHUB_HOST = 'raw.githack.com';
 const GITHUB_PATH_PREFIX = '/SuperOfficeDocs/superoffice-docs/main/docs/en/automation/crmscript/reference/';
-const REFERENCE_FOLDER_PATH = './reference';
+const REFERENCE_FOLDER_PATH = path.join(__dirname, './reference');
 
 let updateReferenceLibraryFiles = false;
 
-let dirPath = '';
 // Cache defined variables, used for getting correct intellisense for classes
 export const completionItemRegistry: CompletionItem[] = [];
 
 export async function validateDirPath(): Promise<Boolean> {
-  dirPath = path.join(__dirname, REFERENCE_FOLDER_PATH);
-  if (!existsSync(dirPath)) {
-    mkdirSync(dirPath, { recursive: true });
+  if (!existsSync(REFERENCE_FOLDER_PATH)) {
+    mkdirSync(REFERENCE_FOLDER_PATH, { recursive: true });
     return false;
   }
   return true;
 }
 
 async function fetchYMLfile(filename: string): Promise<string | undefined> {
-  const filePath = path.join(dirPath, filename);
+  const filePath = path.join(REFERENCE_FOLDER_PATH, filename);
 
   if (!updateReferenceLibraryFiles) {
     const fileContents = await fsPromises.readFile(filePath, 'utf8');

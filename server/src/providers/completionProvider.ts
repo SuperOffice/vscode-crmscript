@@ -1,24 +1,22 @@
-// completionProvider.ts
 import {
     TextDocumentPositionParams,
     CompletionItem,
     CompletionItemKind,
     MarkupContent,
-    MarkupKind,
+    MarkupKind
 } from "vscode-languageserver/node";
 import { documents } from "../server";
 import { readFileSync } from "fs";
 import { load } from "js-yaml";
 import path = require("path");
 import {
-    MyCompletionItemData,
     VariableInfo,
     YmlFile,
     YmlItem,
 } from "../Interfaces";
 import { completionItemRegistry } from "../updateReferenceLibrary";
 
-export function onCompletion(
+export function completionHandler(
     _textDocumentPosition: TextDocumentPositionParams,
     variablesRegistry: Map<string, VariableInfo>
 ): CompletionItem[] {
@@ -97,11 +95,7 @@ export function addvariablesRegistryToCompletionItems(
 function createMarkdown(items: YmlItem): MarkupContent {
     const example = items.example || '';
     const exampleString = Array.isArray(example) ? example[0] : example;
-    const codeBlock = /<code>(.*?)<\/code>/s.exec(exampleString)?.[1] || '';
-    const myData: MyCompletionItemData = {
-        filename: `${items.uid}.yml`,
-        exampleCode: codeBlock
-    };
+    const codeBlock = decodeHtmlEntities(/<code>(.*?)<\/code>/s.exec(exampleString)?.[1] || '');
     return {
         kind: MarkupKind.Markdown,
         value: [
@@ -110,15 +104,28 @@ function createMarkdown(items: YmlItem): MarkupContent {
             '',
             `${items.summary}`,
             '',
-            '```javascript',
+            '```crmscript',
             '',
             `${codeBlock}`,
             '',
             '```',
             '',
-            `Click [here](command:insertExampleCode?${encodeURIComponent(JSON.stringify(myData))}) to insert the example code.`
+            ...(codeBlock ? [`Click [here](command:insertExampleCode?${encodeURIComponent(JSON.stringify(codeBlock))}) to insert the example code.`] : [])
         ].join('\n')
     };
+}
+
+function decodeHtmlEntities(text: string): string {
+    const entities: Record<string, string> = {
+        '&quot;': '"',
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&#39;': "'",
+        '&apos;': "'"
+    };
+
+    return text.replace(/&quot;|&amp;|&lt;|&gt;|&#39;|&apos;/g, (entity) => entities[entity]);
 }
 
 function createCompletionItem(item: YmlItem, completionItemKind: CompletionItemKind): CompletionItem {
