@@ -14,18 +14,27 @@
  * the License.
  */
 
-import { window } from 'vscode';
+import { window, OutputChannel } from 'vscode';
 import {IS_LOG, IS_PROFILE} from './flags';
 import { performance } from 'perf_hooks';
 
+var outputchannel:OutputChannel = undefined;
+
 export function log(message: string, ...args: any[]) {
   if (IS_LOG) {
+    if(!outputchannel)
+    {
+      outputchannel = window.createOutputChannel("CRMScript");
+    }
+    
     let length = args ? args.length : 0;
     if (length > 0) {
-      console.log(message, ...args);
-    } else {
-      console.log(message);
+      var argString = args.join(', ');
+      message = message + ', ' + argString;
     }
+      
+    outputchannel.appendLine(message);
+    console.log(message);
   }
 };
 
