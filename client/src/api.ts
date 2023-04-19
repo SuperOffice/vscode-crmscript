@@ -92,7 +92,10 @@ export function login(username?: string): Promise<void> {
   if (!authFlow.loggedIn()) {
     return authFlow
       .fetchServiceConfiguration()
-      .then(() => authFlow.makeAuthorizationRequest(client));
+      .then(() => authFlow.makeAuthorizationRequest(client)).catch(err => {
+        log(err.message);
+        vscode.window.showErrorMessage( err.message);
+      });
   } else {
     return Promise.resolve();
   }
@@ -126,7 +129,7 @@ function resolveAuthentication(authTenantInfo: AuthTenantInfo) {
     );
   }
 
-  loginStatusBarItem.text = `Logged in to ${tenant}`;
+  loginStatusBarItem.text = `Logged in to SuperOffice`;
   loginStatusBarItem.command = undefined;
   loginStatusBarItem.show();
 }

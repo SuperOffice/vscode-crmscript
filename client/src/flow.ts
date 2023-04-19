@@ -49,8 +49,7 @@ import EventEmitter = require('events');
 import { log } from './logger';
 import { StringMap } from '@openid/appauth/built/types';
 
-import * as jwt from 'jsonwebtoken';
-import * as jwksRsa from 'jwks-rsa';
+import { validateJwtToken } from './tokenHelper';
 import { ClientMeta } from './api';
 
 export class AuthStateEmitter extends EventEmitter {
@@ -72,7 +71,6 @@ const openIdConnectUrl = 'https://sod.superoffice.com/login';
 
 /* client configuration */
 const sod_jwks_uri = 'https://sod.superoffice.com/login/.well-known/jwks';
-const sod_signing_key = 'Frf7jD-asGiFqADGTmTJfEq16Yw';
 const redirectUri = 'http://127.0.0.1:4300/callback';
 const port: number = 4300;
 const scope = 'openid';
@@ -120,6 +118,9 @@ export class AuthFlow {
               authTenantInfo
             );
             log('All Done.');
+          }).catch(error => {
+            log('Error: ', error);
+            this.signOut();
           });
       }
     });
@@ -207,9 +208,13 @@ export class AuthFlow {
         this.accessTokenResponse = response;
         let claims = {};
         if (response.idToken) {
-          claims = this.validateJwtToken(response.idToken);
+          validateJwtToken(response.idToken, sod_jwks_uri)
+          .then((decoded: any) => { 
+            log('Decoded id_token: ', decoded);
+            claims = decoded;
+          });
         }
-        log('Claims: ', claims);
+        log('Claims: \n', JSON.stringify(claims));
 
         return response;
       })
@@ -225,7 +230,7 @@ export class AuthFlow {
     this.accessTokenResponse = undefined;
   }
 
-  performWithFreshTokens(): Promise<AuthTenantInfo> {
+  async performWithFreshTokens(): Promise<AuthTenantInfo> {
     log('In performWithFreshTokens');
 
     if (!this.configuration) {
@@ -236,15 +241,12 @@ export class AuthFlow {
     if (!this.refreshToken) {
       log('Missing refreshToken.');
       authTenantInfo.errorMessage = 'Missing refreshToken.';
-      return Promise.resolve(authTenantInfo);
+      return authTenantInfo;
     }
     // only verifies expiration time
-    if (
-      this.accessTokenResponse &&
-      this.accessTokenResponse.isValid() &&
-      this.idTokenIsValid(this.accessTokenResponse, authTenantInfo)
-    ) {
-      return Promise.resolve(authTenantInfo);
+    if ( this.accessTokenResponse && this.accessTokenResponse.isValid()) {
+      var valid = await this.idTokenIsValid(this.accessTokenResponse, authTenantInfo);
+      return authTenantInfo;
     }
 
     const extras: StringMap = { client_secret: clientSecret };
@@ -269,65 +271,26 @@ export class AuthFlow {
         return authTenantInfo;
       });
   }
-  idTokenIsValid(
+  
+  async idTokenIsValid(
     accessTokenResponse: TokenResponse,
     authTenantInfo: AuthTenantInfo
-  ): boolean {
+  ): Promise<boolean> {
+    
+    log('In idTokenIsValid');
+  
     authTenantInfo.accessToken = accessTokenResponse.accessToken;
     authTenantInfo.idToken = accessTokenResponse.idToken;
-    this.validateJwtToken(accessTokenResponse.idToken)
-      .then(result => {
-        log('Valid Token!');
-        authTenantInfo.claims = result;
-        return true;
-      })
-      .catch(err => {
-        log('Error validating token: ', err);
-        return false;
-      });
-
-    return false;
-  }
-
-  async validateJwtToken(token: string | undefined): Promise<{}> {
-    if (!token) {
-      return {};
+    
+    try {
+      const result = await validateJwtToken(accessTokenResponse.idToken, sod_jwks_uri);
+      log('Valid Token!');
+      authTenantInfo.claims = result;
+      return true;
+    } catch (err) {
+      log('Error validating token: ', err);
+      this.signOut();
+      return false;
     }
-
-    const soPublicKey = await this.getSigningKey();
-    return await this.validateToken(token, soPublicKey);
-  }
-
-  async getSigningKey(): Promise<any> {
-    return new Promise(function(resolve, reject) {
-      var client = jwksRsa({
-        cache: true,
-        jwksUri: sod_jwks_uri
-      });
-
-      client.getSigningKey(sod_signing_key, function(err, key) {
-        if (err) {
-          reject(err);
-        } else {
-          var signingKey = key.publicKey || key.rsaPublicKey;
-          resolve(signingKey);
-        }
-      });
-    });
-  }
-
-  validateToken(token: string, publicKey: string) {
-    return new Promise(function(resolve, reject) {
-      var options = { ignoreExpiration: true, algorithm: ['RS256'] };
-
-      jwt.verify(token, publicKey, options, function(err, decoded) {
-        if (err) {
-          reject(err);
-        } else {
-          console.log(JSON.stringify(decoded));
-          resolve(decoded);
-        }
-      });
-    });
   }
 }

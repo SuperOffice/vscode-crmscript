@@ -5,19 +5,13 @@
     "version": "0.0.1",
     "publisher": "sintef",
     "engines": {
-        "vscode": "^1.19.0"
+        "vscode": "^1.75.0"
     },
     "categories": [
         "Programming Languages"
     ],
-    "activationEvents": [
-        "onLanguage:crmscript",
-        "onCommand:cirrus.login",
-        "onCommand:cirrus.createProject",
-        "onCommand:cirrus.downloadToCurrentFolder",
-        "onCommand:cirrus.uploadAllInFolder"
-    ],
-    "main": "./out/extension",
+    "activationEvents": [],
+    "main": "./client/out/extension",
     "contributes": {
         "commands": [
             {
@@ -55,31 +49,31 @@
                     ".crmscript",
                     ".ejscript"
                 ],
-                "configuration": "./language-configuration-crmscript.json"
+                "configuration": "./client/language-configuration-crmscript.json"
             }
         ],
         "grammars": [
             {
                 "language": "crmscript",
                 "scopeName": "source.crmscript",
-                "path": "./syntaxes/crmscript.tmLanguage.json"
+                "path": "./client/syntaxes/crmscript.tmLanguage.json"
             }
         ],
         "themes": [
             {
                 "label": "CRMScriptTheme",
                 "uiTheme": "vs-dark",
-                "path": "./themes/CRMScriptTheme.json"
+                "path": "./client/themes/CRMScriptTheme.json"
             },
             {
                 "label": "Sample Light",
                 "uiTheme": "vs",
-                "path": "./themes/Sample_Light.tmTheme"
+                "path": "./client/themes/Sample_Light.tmTheme"
             },
             {
                 "label": "Sample Dark",
                 "uiTheme": "vs-dark",
-                "path": "./themes/Sample_Dark.tmTheme"
+                "path": "./client/themes/Sample_Dark.tmTheme"
             }
         ],
         "menus": {
@@ -94,31 +88,17 @@
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
+        "compile": "npm run compile-client && npm run compile-server && tsc -p ./",
+        "compile-client": "npx tsc -p ./client",
+        "compile-server": "npx tsc -p ./server",
         "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
-    },
-    "dependencies": {
-        "@openid/appauth": "^1.1.1",
-        "events": "3.0.0",
-        "jquery": "^3.4.1",
-        "jsonwebtoken": "^8.5.1",
-        "jwks-rsa": "^1.4.0",
-        "mac-open": "^0.1.3",
-        "md5": "2.2.1",
-        "open": "^6.3.0",
-        "request-promise": "4.2.2",
-        "typescript-rest": "1.7.0"
-    },
+        "lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
+        "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+        "test": "sh ./scripts/e2e.sh"
+      },
     "devDependencies": {
-        "@types/jquery": "3.3.6",
-        "@types/jsonwebtoken": "^8.3.2",
-        "@types/mocha": "^2.2.42",
-        "@types/node": "^7.0.43",
-        "@types/react": "^16.7.1",
-        "@types/request-promise": "4.1.42",
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.34"
+        "@types/express": "^4.17.17",
+        "@types/node": "^18.15.11",
+        "typescript": "^5.0.4"
     }
 }

@@ -2,6 +2,7 @@ import {CrmScriptProject, getProjectForCurrentFolder} from './cirrusProject'
 import * as vscode from 'vscode';
 import {uri2fspath} from './util';
 import * as api from './api';
+import { log } from './logger';
 
 var fs = require('fs')
 
@@ -57,18 +58,9 @@ export function onScriptFileSaved(d: vscode.TextDocument){
 
 export function login(){
     api.login().then(() => {
-        if(!outputchannel)
-            outputchannel = vscode.window.createOutputChannel("CRMScript");
-
-        outputchannel.appendLine("Login Successful");
+        log("Beginning Login");
     }).catch(reason => {
-        console.log("Login failed....");
-
-        if(!outputchannel)
-            outputchannel = vscode.window.createOutputChannel("CRMScript");
-
-        outputchannel.appendLine("Login Failed");
-
+        log("Login failed...", reason);
     });
 }
 
