@@ -14,8 +14,9 @@ An offline IDE for customising SuperOffice CRM with its CRMScript language.
     * Execute the Script opened in the current editor. Command "Cirrus: Execute the current script". Results will be shown in OUTPUT->CRMSCript
 - CRMScript editor
     * Syntax highlighting
-    * CompletionItems for Variables/Classes
+    * CompletionItems for Base Variables/Classes
     * CompletiomItems for methods
+    * CompletionItems for variables defined in the code
     * Update intellisense from docs.superoffice.com/Github on startup
 - Built-in features by Visual Studio Code
     * Source control (Git)
