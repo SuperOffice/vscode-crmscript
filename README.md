@@ -14,8 +14,9 @@ An offline IDE for customising SuperOffice CRM with its CRMScript language.
     * Execute the Script opened in the current editor. Command "Cirrus: Execute the current script". Results will be shown in OUTPUT->CRMSCript
 - CRMScript editor
     * Syntax highlighting
-    * Auto-completion of variables with candidate functions
-    * Pop-up function documents by mouse hovering
+    * CompletionItems for Variables/Classes
+    * CompletiomItems for methods
+    * Update intellisense from docs.superoffice.com/Github on startup
 - Built-in features by Visual Studio Code
     * Source control (Git)
     * Code search, find, replace
@@ -29,7 +30,7 @@ An offline IDE for customising SuperOffice CRM with its CRMScript language.
 - ```cd vscode-crmscript```
 - ```npm install```
 - Open VS Code from this folder (e.g., ```code .```) 
-- Debug -> Start Debugging (F5)
+- Debug -> Client + Server -> Start Debugging (F5)
 
 # Install from binary
 - Download vsix package: https://github.com/SuperOffice/vscode-crmscript/releases/download/0.0.1/crmscript-0.0.1.vsix
