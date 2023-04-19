@@ -17,7 +17,7 @@ An offline IDE for customising SuperOffice CRM with its CRMScript language.
     * CompletionItems for Base Variables/Classes
     * CompletiomItems for methods
     * CompletionItems for variables defined in the code
-    * Update intellisense from docs.superoffice.com/Github on startup
+    * Update intellisense from github.com/superoffice-docs on startup
 - Built-in features by Visual Studio Code
     * Source control (Git)
     * Code search, find, replace
