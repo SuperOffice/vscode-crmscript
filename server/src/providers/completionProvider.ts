@@ -4,7 +4,7 @@ import {
     CompletionItemKind,
     MarkupContent,
     MarkupKind,
-    integer
+    InsertTextFormat
 } from "vscode-languageserver/node";
 import { documents } from "../server";
 import { readFileSync } from "fs";
@@ -158,7 +158,8 @@ function createCompletionItem(item: YmlItem, completionItemKind: CompletionItemK
     const obj: CompletionItem = {
         label: item.name,
         kind: completionItemKind,
-        insertText: `${item.name} ${item.name.toLowerCase()};`,
+        insertTextFormat: InsertTextFormat.Snippet,
+        insertText: `${item.name} $0;`,
         documentation: createMarkdown(item),
         data: {
             filename: `${item.uid as string}.yml`,
