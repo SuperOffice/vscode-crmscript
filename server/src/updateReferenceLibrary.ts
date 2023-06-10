@@ -5,6 +5,7 @@ import { CompletionItem } from 'vscode-languageserver/node';
 import { YmlFile, YmlItem } from './Interfaces';
 import axios from 'axios';
 import { addCompletionClassItem, addCompletionItem } from './providers/completionProvider';
+import { CreateIntellisenseFromFileContent, writeAllCompletionItemsToFile } from './Intellisense/generateIntellisense';
 
 const GITHUB_HOST = 'raw.githack.com';
 const GITHUB_PATH_PREFIX = '/SuperOfficeDocs/superoffice-docs/main/docs/en/automation/crmscript/reference/';
@@ -57,6 +58,7 @@ async function parseChildren(children: string[]): Promise<void> {
       const result = await fetchYMLfile(`${child}.yml`);
       if (result) {
         const childFile = load(result) as YmlFile;
+        await CreateIntellisenseFromFileContent(childFile);
         addCompletionItem(childFile.items as YmlItem[]);
       } else {
         console.error(`Could not find file ${child}.yml`);
@@ -98,6 +100,8 @@ async function processTocItems(items: YmlItem[]): Promise<void> {
 
 export async function UpdateReferenceLibrary(update: boolean) {
   updateReferenceLibraryFiles = update;
+  //await generateIntellisense("CRMScript.Global.Integer.yml");
+
   await validateDirPath();
 
   const result = await fetchYMLfile('toc.yml');
@@ -105,10 +109,12 @@ export async function UpdateReferenceLibrary(update: boolean) {
     const tocFile = load(result) as YmlFile;
     if (tocFile) {
       await processTocItems(tocFile.items);
+      await writeAllCompletionItemsToFile();
     }
   } else {
     console.error(`Could not download toc.yml`);
   }
   return true;
 }
+
 

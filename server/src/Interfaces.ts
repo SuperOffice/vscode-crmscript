@@ -22,7 +22,7 @@ export interface YmlItem {
 	syntax?: {
 		content: string;
 	};
-	example?: string;
+	example?: string | string[];
 }
 
 export interface YmlReference {

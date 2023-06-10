@@ -63,19 +63,19 @@ export function addClassMethods(
         ymlFile = load(contents) as YmlFile;
 
     ymlFile.items.slice(1).forEach((item) => {
-            if(item.type === 'Method'){
-                const obj: CompletionItem = {
-                    label: item.name,
-                    kind: CompletionItemKind.Method,
-                    insertText: `${item.name};`,
-                    documentation: createMarkdown(item),
-                    data: {
-                        filename: `${item.uid as string}.yml`,
-                        exampleCode: "",
-                    },
-                };
-                completionItems.push(obj);
-            }
+        if (item.type === 'Method') {
+            const obj: CompletionItem = {
+                label: item.name,
+                kind: CompletionItemKind.Method,
+                insertText: `${item.name};`,
+                documentation: createMarkdownForYml(item),
+                data: {
+                    filename: `${item.uid as string}.yml`,
+                    exampleCode: "",
+                },
+            };
+            completionItems.push(obj);
+        }
     });
     return completionItems;
 }
@@ -92,33 +92,27 @@ export function addvariablesRegistryToCompletionItems(
     });
 
     methodsRegistry.forEach((_value, key) => {
-        const obj: CompletionItem = {
-            label: key,
-            kind: CompletionItemKind.Function,
-            insertText: `${key};`,
-            documentation: {
-                kind: MarkupKind.Markdown,
-                value: [
-                    `# ${key}`,
-                    '',
-                    `Summary goes here`,
-                    '',
-                    '```crmscript',
-                    '',
-                    `CodeBlock goes here`,
-                    '',
-                    '```',
-                    '',
-                ].join('\n')
-            },
-            detail: `returns ${_value.returns}`,
-        };
-        completionItems.push(obj);
+        let insertTextWithParams: string = `${key}(`;
+        _value.params.forEach((element, index) => {
+            insertTextWithParams += `\${${index + 1}:${element}}, `;
+        });
+
+        // Remove the last comma and space, add closing parenthesis and semicolon
+        insertTextWithParams = insertTextWithParams.slice(0, -2) + ");";
+
+        completionItems.push(CreateCompletionItem(key, CompletionItemKind.Function, insertTextWithParams, createMarkdown(key), null));
     });
 
     return completionItems;
 }
-function createMarkdown(items: YmlItem): MarkupContent {
+function createCompletionItemForYml(item: YmlItem, completionItemKind: CompletionItemKind): CompletionItem {
+    const data = {
+        filename: `${item.uid as string}.yml`,
+        exampleCode: "",
+    }
+    return CreateCompletionItem(item.name, completionItemKind, `${item.name} $0;`, createMarkdownForYml(item), data);
+}
+function createMarkdownForYml(items: YmlItem): MarkupContent {
     const example = items.example || '';
     const exampleString = Array.isArray(example) ? example[0] : example;
     const codeBlock = decodeHtmlEntities(/<code>(.*?)<\/code>/s.exec(exampleString)?.[1] || '');
@@ -140,7 +134,34 @@ function createMarkdown(items: YmlItem): MarkupContent {
         ].join('\n')
     };
 }
-
+function createMarkdown(label: string): MarkupContent {
+    return {
+        kind: MarkupKind.Markdown,
+        value: [
+            `# ${label}`,
+            '',
+            `Summary goes here`,
+            '',
+            '```crmscript',
+            '',
+            `CodeBlock goes here`,
+            '',
+            '```',
+            '',
+        ].join('\n')
+    };
+}
+function CreateCompletionItem(label: string, completionItemKind: CompletionItemKind, insertText: string, documentation: MarkupContent, data: any): CompletionItem {
+    const obj: CompletionItem = {
+        label: label,
+        kind: completionItemKind,
+        insertTextFormat: InsertTextFormat.Snippet,
+        insertText: insertText,
+        documentation: documentation,
+        data: data,
+    };
+    return obj;
+}
 function decodeHtmlEntities(text: string): string {
     const entities: Record<string, string> = {
         '&quot;': '"',
@@ -153,28 +174,11 @@ function decodeHtmlEntities(text: string): string {
 
     return text.replace(/&quot;|&amp;|&lt;|&gt;|&#39;|&apos;/g, (entity) => entities[entity]);
 }
-
-function createCompletionItem(item: YmlItem, completionItemKind: CompletionItemKind): CompletionItem {
-    const obj: CompletionItem = {
-        label: item.name,
-        kind: completionItemKind,
-        insertTextFormat: InsertTextFormat.Snippet,
-        insertText: `${item.name} $0;`,
-        documentation: createMarkdown(item),
-        data: {
-            filename: `${item.uid as string}.yml`,
-            exampleCode: "",
-        },
-    };
-    return obj;
-}
-
 export function addCompletionItem(items: YmlItem[]) {
-    completionItemRegistry.push(createCompletionItem(items[0], CompletionItemKind.Class));
+    completionItemRegistry.push(createCompletionItemForYml(items[0], CompletionItemKind.Class));
 }
-
 export function addCompletionClassItem(items: YmlItem[]) {
     items.forEach(element => {
-        completionItemRegistry.push(createCompletionItem(element, CompletionItemKind.Method));
+        completionItemRegistry.push(createCompletionItemForYml(element, CompletionItemKind.Method));
     });
 }
