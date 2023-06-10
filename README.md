@@ -30,6 +30,7 @@ An offline IDE for customising SuperOffice CRM with its CRMScript language.
 - ```git clone https://github.com/SuperOffice/vscode-crmscript```
 - ```cd vscode-crmscript```
 - ```npm install```
+- ```npm run compile```
 - Open VS Code from this folder (e.g., ```code .```) 
 - Debug -> Client + Server -> Start Debugging (F5)
 

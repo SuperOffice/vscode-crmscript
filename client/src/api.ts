@@ -19,18 +19,23 @@ export interface ClientMeta {
   namespace: string;
 }
 
-var apiCode: string = undefined;
-var tenant: string = undefined;
-var client: ClientMeta = undefined;
-const clientfile = 'client.json';
-
+let webapiUrl: string;
+let client: ClientMeta = { id: "", secret: "", namespace: "" };
 const authFlow: AuthFlow = new AuthFlow();
-let authTent: AuthTenantInfo = undefined;
+let authTenant: AuthTenantInfo = new AuthTenantInfo();
+const clientFile = 'client.json';
+let loginStatusBarItem: vscode.StatusBarItem | undefined = undefined;
 
-var loginStatusBarItem: vscode.StatusBarItem = undefined;
+
+//var apiCode: string = undefined;
+//var tenant: string = undefined;
+//var client: ClientMeta = undefined;
+//const authFlow: AuthFlow = new AuthFlow();
+//let authTenant: AuthTenantInfo = undefined;
+//var loginStatusBarItem: vscode.StatusBarItem = undefined;
 
 function initiateClient() {
-  let clientfullpath = `${getCurrentFsPath()}/${clientfile}`;
+  let clientfullpath = `${getCurrentFsPath()}/${clientFile}`;
   if (fs.existsSync(clientfullpath)) {
     let tmpclient = JSON.parse(fs.readFileSync(clientfullpath));
     if (tmpclient.id.length == 32 && tmpclient.secret.length == 32) {
@@ -51,7 +56,7 @@ function initiateClient() {
       secret: '<ClientSecret>',
       namespace: '<namespace>'
     };
-    fs.writeFile(clientfullpath, JSON.stringify(client, null, 2), err => {
+    fs.writeFile(clientfullpath, JSON.stringify(client, null, 2), (err: any) => {
       if (err) throw err;
       vscode.commands.executeCommand(
         'vscode.open',
@@ -85,7 +90,7 @@ export function initApi() {
 //var configuration: AuthorizationServiceConfiguration | undefined;
 export function login(username?: string): Promise<void> {
   if (!initiateClient()) {
-    return;
+    return Promise.resolve();
   }
 
   log('Signing in...');
@@ -102,7 +107,7 @@ export function login(username?: string): Promise<void> {
 }
 
 function resolveAuthentication(authTenantInfo: AuthTenantInfo) {
-  authTent = authTenantInfo;
+  authTenant = authTenantInfo;
   let accessToken = authTenantInfo.accessToken;
 
   //authTenantInfo.claims["iss"]
@@ -114,10 +119,10 @@ function resolveAuthentication(authTenantInfo: AuthTenantInfo) {
   //authTenantInfo.claims["http://schemes.superoffice.net/identity/identityprovider"]
   //authTenantInfo.claims["http://schemes.superoffice.net/identity/is_administrator"]
   //authTenantInfo.claims["http://schemes.superoffice.net/identity/serial"]
-  //authTenantInfo.claims["http://schemes.superoffice.net/identity/webapi_url"]
+  webapiUrl = authTenantInfo.claims["http://schemes.superoffice.net/identity/webapiUrl"];
   //authTenantInfo.claims["http://schemes.superoffice.net/identity/netserver_url"]
   //authTenantInfo.claims["http://schemes.superoffice.net/identity/upn"]
-  tenant = authTenantInfo.claims['http://schemes.superoffice.net/identity/ctx'];
+  //tenant = authTenantInfo.claims['http://schemes.superoffice.net/identity/ctx'];
 
   log('AuthTenantInfo', authTenantInfo);
 
@@ -134,44 +139,44 @@ function resolveAuthentication(authTenantInfo: AuthTenantInfo) {
   loginStatusBarItem.show();
 }
 
-export function listAllScripts(callback: (string) => void) {
+export function listAllScripts(callback: (arg0: string) => void) {
   let options = {
-    uri: `https://sod.superoffice.com/${tenant}/api/v1/Script/`,
+    uri: `${webapiUrl}v1/Script/`, // Use template literals
     headers: {
-      Authorization: `Bearer ${authTent.accessToken}`,
+      Authorization: `Bearer ${authTenant.accessToken}`,
       Accept: 'application/json'
     }
   };
   rp(options)
-    .then(res => {
+    .then((res: string) => {
       let values = JSON.stringify(JSON.parse(res).value);
       callback(values);
     })
-    .catch(err => {
+    .catch((err: any) => {
       console.error('Error:', err);
     });
 }
 
 export function getScriptSource(
   meta: ScriptMeta,
-  callback: (string) => void
-): string {
+  callback: (arg0: string) => void
+): string | undefined {
   if (!meta.uniqueIdentifier) return undefined;
   let options = {
-    uri: `https://sod.superoffice.com/${tenant}/api/v1/Script/${
+    uri: `${webapiUrl}v1/Script/${
       meta.uniqueIdentifier
     }`,
     headers: {
-      Authorization: `Bearer ${authTent.accessToken}`,
+      Authorization: `Bearer ${authTenant.accessToken}`,
       Accept: 'application/json'
     }
   };
   rp(options)
-    .then(res => {
+    .then((res: string) => {
       let sourcecode = JSON.parse(res).Source;
       callback(sourcecode);
     })
-    .catch(err => {
+    .catch((err: any) => {
       console.error('ERROR: ', err);
     });
 }
@@ -184,11 +189,11 @@ export function uploadScriptSource(
   //@todo!!
   let options = {
     method: 'PUT',
-    uri: `https://sod.superoffice.com/${tenant}/api/v1/Script/${
+    uri: `${webapiUrl}v1/Script/${
       meta.uniqueIdentifier ? meta.uniqueIdentifier : ''
     }`,
     headers: {
-      Authorization: `Bearer ${authTent.accessToken}`,
+      Authorization: `Bearer ${authTenant.accessToken}`,
       'Content-Type': 'application/json'
     },
     body: {
@@ -204,10 +209,10 @@ export function uploadScriptSource(
   if (!options.body.UniqueIdentifier) delete options.body.UniqueIdentifier;
   console.log(`upload ${options.uri}`);
   rp(options)
-    .then(res => {
+    .then((res: any) => {
       if (post) post(res);
     })
-    .catch(err => {
+    .catch((err: any) => {
       console.log(err);
     });
 }
@@ -216,39 +221,39 @@ export function deleteScript(meta: ScriptMeta, post: (res: any) => void) {
   //@todo!!
   let options = {
     method: 'DELETE',
-    uri: `https://sod.superoffice.com/${tenant}/api/v1/Script/${
+    uri: `${webapiUrl}v1/Script/${
       meta.uniqueIdentifier
     }`,
     headers: {
-      Authorization: `Bearer ${authTent.accessToken}`,
+      Authorization: `Bearer ${authTenant.accessToken}`,
       'Content-Type': 'application/json'
     }
   };
   rp(options)
-    .then(res => {
+    .then((res: any) => {
       if (post) post(res);
     })
-    .catch(err => {
+    .catch((err: any) => {
       console.log(err);
     });
 }
 
 export function executeScript(meta: ScriptMeta, post: (res: any) => void) {
   let options = {
-    uri: `https://sod.superoffice.com/${tenant}/api/v1/CRMScript/${
+    uri: `${webapiUrl}v1/CRMScript/${
       meta.ejscriptId
     }/Execute`,
     headers: {
-      Authorization: `Bearer ${authTent.accessToken}`,
+      Authorization: `Bearer ${authTenant.accessToken}`,
       'Content-Type': 'application/json'
     }
   };
   console.log(options.uri);
   rp(options)
-    .then(res => {
+    .then((res: any) => {
       if (post) post(res);
     })
-    .catch(err => {
+    .catch((err: any) => {
       console.log(err);
     });
 }
@@ -258,6 +263,6 @@ export function getNameSpace() {
   return client.namespace;
 }
 
-export function getTenant() {
+/*export function getTenant() {
   return tenant;
-}
+}*/
