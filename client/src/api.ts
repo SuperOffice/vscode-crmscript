@@ -119,7 +119,7 @@ function resolveAuthentication(authTenantInfo: AuthTenantInfo) {
   //authTenantInfo.claims["http://schemes.superoffice.net/identity/identityprovider"]
   //authTenantInfo.claims["http://schemes.superoffice.net/identity/is_administrator"]
   //authTenantInfo.claims["http://schemes.superoffice.net/identity/serial"]
-  webapiUrl = authTenantInfo.claims["http://schemes.superoffice.net/identity/webapiUrl"];
+  webapiUrl = authTenantInfo.claims["http://schemes.superoffice.net/identity/webapi_url"];
   //authTenantInfo.claims["http://schemes.superoffice.net/identity/netserver_url"]
   //authTenantInfo.claims["http://schemes.superoffice.net/identity/upn"]
   //tenant = authTenantInfo.claims['http://schemes.superoffice.net/identity/ctx'];
