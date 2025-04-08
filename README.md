@@ -1,5 +1,7 @@
 # CRMScript IDE
 
+**This extension has been moved/re-created in favour of the new [language-tools](https://github.com/SuperOffice/language-tools)**
+
 An offline IDE for customising SuperOffice CRM with its CRMScript language.
 
 # Features
